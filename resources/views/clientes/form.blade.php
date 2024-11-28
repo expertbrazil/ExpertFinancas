@@ -66,7 +66,7 @@
                                 <div class="col-md-3">
                                     <label class="form-label">Data de Nascimento</label>
                                     <input type="date" class="form-control" name="data_nascimento" 
-                                        value="{{ old('data_nascimento', $cliente->data_nascimento ?? '') }}">
+                                        value="{{ old('data_nascimento', isset($cliente) && $cliente->data_nascimento ? $cliente->data_nascimento->format('Y-m-d') : '') }}">
                                 </div>
                             </div>
                         </div>
@@ -86,7 +86,7 @@
                                 <div class="col-md-3">
                                     <label class="form-label">Data de Fundação</label>
                                     <input type="date" class="form-control" name="data_fundacao" 
-                                        value="{{ old('data_fundacao', $cliente->data_fundacao ?? '') }}">
+                                        value="{{ old('data_fundacao', isset($cliente) && $cliente->data_fundacao ? $cliente->data_fundacao->format('Y-m-d') : '') }}">
                                 </div>
                             </div>
                         </div>

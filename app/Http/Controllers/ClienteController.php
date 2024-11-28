@@ -35,10 +35,10 @@ class ClienteController extends Controller
             'complemento' => 'nullable',
             'bairro' => 'nullable',
             'cidade' => 'nullable',
-            'estado' => 'nullable|size:2',
+            'uf' => 'nullable|size:2',
             'observacoes' => 'nullable',
-            'data_nascimento' => 'nullable|date',
-            'data_fundacao' => 'nullable|date'
+            'data_nascimento' => 'nullable|date_format:Y-m-d',
+            'data_fundacao' => 'nullable|date_format:Y-m-d'
         ];
 
         // Regras específicas para Pessoa Física
@@ -88,10 +88,10 @@ class ClienteController extends Controller
             'complemento' => 'nullable',
             'bairro' => 'nullable',
             'cidade' => 'nullable',
-            'estado' => 'nullable|size:2',
+            'uf' => 'nullable|size:2',
             'observacoes' => 'nullable',
-            'data_nascimento' => 'nullable|date',
-            'data_fundacao' => 'nullable|date'
+            'data_nascimento' => 'nullable|date_format:Y-m-d',
+            'data_fundacao' => 'nullable|date_format:Y-m-d'
         ];
 
         // Regras específicas para Pessoa Física
