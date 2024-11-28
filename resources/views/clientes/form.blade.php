@@ -1,6 +1,17 @@
 @extends('layouts.app')
 
 @section('content')
+<script>
+    function confirmarCancelamento() {
+        // Se estiver editando (existe $cliente), mostra confirmação
+        @if(isset($cliente))
+            return confirm('Deseja realmente cancelar a edição?');
+        @else
+            return true; // Se for novo registro, não mostra confirmação
+        @endif
+    }
+</script>
+
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -152,6 +163,9 @@
 
                         <div class="row mb-0">
                             <div class="col-md-12 text-end">
+                                <a href="{{ route('clientes.index') }}" class="btn btn-secondary me-2" onclick="return confirmarCancelamento()">
+                                    <i class="fas fa-times me-2"></i>Cancelar
+                                </a>
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-save me-2"></i>{{ isset($cliente) ? 'Atualizar' : 'Salvar' }}
                                 </button>
