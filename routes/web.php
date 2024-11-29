@@ -9,7 +9,12 @@ use App\Http\Controllers\ProdutoController;
 use App\Http\Controllers\ContaPagarController;
 use App\Http\Controllers\ContaReceberController;
 use App\Http\Controllers\PlanoHospedagemController;
+use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\ParametroController;
+use App\Http\Controllers\RelatorioController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserRegistrationController;
+use App\Http\Controllers\PasswordController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('clientes', ClienteController::class);
     Route::resource('servicos', ServicoController::class);
     Route::resource('produtos', ProdutoController::class);
+    Route::resource('categorias', CategoriaController::class);
 
     // Módulo Financeiro
     Route::resource('contas-pagar', ContaPagarController::class);
@@ -44,6 +50,23 @@ Route::middleware(['auth'])->group(function () {
 
     // Planos de Hospedagem
     Route::resource('planos', PlanoHospedagemController::class);
+
+    // Gerenciamento de Usuários
+    Route::get('/users/create', [UserRegistrationController::class, 'create'])->name('users.create');
+    Route::post('/users', [UserRegistrationController::class, 'store'])->name('users.store');
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+    Route::patch('/users/{user}/toggle-status', [UserController::class, 'toggleStatus'])->name('users.toggle-status');
+    
+    // Rotas para alteração de senha
+    Route::get('/users/{user}/password', [PasswordController::class, 'edit'])->name('users.password.edit');
+    Route::put('/users/{user}/password', [PasswordController::class, 'update'])->name('users.password.update');
+
+    // Subcategorias (AJAX)
+    Route::get('/categorias/{categoria}/subcategorias', [CategoriaController::class, 'getSubcategorias'])
+        ->name('categorias.subcategorias');
 
     // Validação de CPF/CNPJ
     Route::get('/validacao-cpf', function () {

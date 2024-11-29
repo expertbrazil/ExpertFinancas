@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\AdminUserSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,15 +11,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
-
-        $this->call([
-            AdminUserSeeder::class,
-        ]);
+        // Primeiro cria os papéis
+        $this->call(RoleSeeder::class);
+        
+        // Depois cria o usuário admin
+        $this->call(AdminSeeder::class);
     }
 }

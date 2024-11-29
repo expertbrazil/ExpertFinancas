@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('categorias', function (Blueprint $table) {
             $table->id();
+            $table->string('codigo')->unique();
             $table->string('nome');
+            $table->text('descricao')->nullable();
             $table->enum('tipo', ['receita', 'despesa']);
-            $table->string('descricao')->nullable();
-            $table->string('cor', 7)->nullable();
-            $table->string('icone')->nullable();
+            $table->foreignId('categoria_pai_id')->nullable()->constrained('categorias')->onDelete('cascade');
+            $table->integer('nivel')->default(1);
+            $table->boolean('ativo')->default(true);
             $table->timestamps();
         });
     }

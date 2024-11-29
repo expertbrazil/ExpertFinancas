@@ -171,6 +171,15 @@
     </div>
 </div>
 
+<style>
+    #faturamentoChart {
+        display: block;
+        box-sizing: border-box;
+        height: 1080px !important; /* Fix height to 1080px */
+        width: 1000px;
+    }
+</style>
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>

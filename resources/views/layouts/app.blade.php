@@ -20,7 +20,9 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/custom-colors.css') }}">
+    @auth
     <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
+    @endauth
 
     <style>
         :root {
@@ -42,6 +44,7 @@
     @stack('styles')
 </head>
 <body class="d-flex flex-column min-vh-100" style="background-color: var(--background-color); color: var(--text-color);">
+    @auth
     <!-- Sidebar -->
     <nav class="sidebar">
         <div class="sidebar-header">
@@ -109,15 +112,28 @@
             </li>
 
             <li>
-                <a href="{{ route('parametros.edit') }}">
-                    <i class="fas fa-cogs"></i> Configurações
+                <a href="#parametrosSubmenu" data-bs-toggle="collapse" aria-expanded="false">
+                    <i class="fas fa-cogs"></i> Parâmetros
                 </a>
+                <ul class="sidebar-submenu collapse" id="parametrosSubmenu">
+                    <li>
+                        <a href="{{ route('users.index') }}">
+                            <i class="fas fa-users"></i> Usuários
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('parametros.edit') }}">
+                            <i class="fas fa-wrench"></i> Configurações
+                        </a>
+                    </li>
+                </ul>
             </li>
         </ul>
     </nav>
+    @endauth
 
     <!-- Main Content -->
-    <div class="main-content">
+    <div class="main-content {{ !Auth::check() ? 'w-100' : '' }}">
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
