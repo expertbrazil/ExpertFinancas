@@ -20,10 +20,10 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Logo</label>
-                                <input type="file" class="form-control" name="logo" accept="image/*">
-                                @if($parametro->logo_path)
+                                <input type="file" class="form-control" name="logo" accept="image/jpeg,image/png,image/webp,image/svg+xml">
+                                @if($parametro->logo_path && file_exists(public_path($parametro->logo_path)))
                                     <div class="mt-2">
-                                        <img src="{{ $parametro->logo_url }}" alt="Logo atual" style="max-height: 50px;">
+                                        <img src="/{{ $parametro->logo_path }}" alt="Logo atual" style="max-width: 200px; height: auto;">
                                     </div>
                                 @endif
                             </div>

@@ -4,7 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Parametro;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use Intervention\Image\ImageManager;
+use Intervention\Image\Drivers\Gd\Driver;
 
 class ParametroController extends Controller
 {
@@ -57,33 +58,56 @@ class ParametroController extends Controller
         
         $validated = $request->validate([
             'nome_sistema' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'cor_primaria' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'cor_secundaria' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'cor_fundo' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'cor_texto' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'cor_navbar' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
-            'cor_footer' => 'required|string|regex:/^#[0-9A-Fa-f]{6}$/',
+            'cor_primaria' => 'required|string|max:7',
+            'cor_secundaria' => 'required|string|max:7',
+            'cor_fundo' => 'required|string|max:7',
+            'cor_texto' => 'required|string|max:7',
+            'cor_navbar' => 'required|string|max:7',
+            'cor_footer' => 'required|string|max:7',
             'email_contato' => 'nullable|email|max:255',
             'telefone_contato' => 'nullable|string|max:20',
             'texto_rodape' => 'nullable|string|max:1000',
+            'logo' => 'nullable|image|mimes:jpeg,png,webp,svg|max:2048'
         ]);
 
-        if ($request->hasFile('logo')) {
-            // Remove logo anterior se existir
-            if ($parametro->logo_path) {
-                Storage::delete($parametro->logo_path);
+        try {
+            if ($request->hasFile('logo')) {
+                $file = $request->file('logo');
+                $filename = 'logo_' . time() . '.' . $file->getClientOriginalExtension();
+                $path = public_path('logos/' . $filename);
+                
+                // Remove logo antiga se existir
+                if ($parametro->logo_path && file_exists(public_path($parametro->logo_path))) {
+                    unlink(public_path($parametro->logo_path));
+                }
+
+                // Se for SVG, move diretamente
+                if ($file->getClientOriginalExtension() === 'svg') {
+                    $file->move(public_path('logos'), $filename);
+                } else {
+                    // Para outros formatos, usa o Intervention Image
+                    $manager = new ImageManager(new Driver());
+                    $image = $manager->read($file->getRealPath());
+                    $image->scale(width: 200);
+                    
+                    if ($file->getClientOriginalExtension() === 'png') {
+                        $image->toPng()->save($path);
+                    } else {
+                        $image->toJpeg()->save($path);
+                    }
+                }
+
+                $validated['logo_path'] = 'logos/' . $filename;
             }
-            
-            // Salva nova logo
-            $path = $request->file('logo')->store('public/logos');
-            $validated['logo_path'] = $path;
+
+            $parametro->update($validated);
+
+            return redirect()->route('parametros.edit')
+                ->with('success', 'Configurações atualizadas com sucesso!');
+        } catch (\Exception $e) {
+            return redirect()->route('parametros.edit')
+                ->with('error', 'Erro ao atualizar as configurações: ' . $e->getMessage());
         }
-
-        $parametro->update($validated);
-
-        return redirect()->route('parametros.edit')
-            ->with('success', 'Configurações atualizadas com sucesso!');
     }
 
     public function destroy(Parametro $parametro)
@@ -96,7 +120,7 @@ class ParametroController extends Controller
 
         // Remove a logo se existir
         if ($parametro->logo_path) {
-            Storage::delete($parametro->logo_path);
+            unlink(public_path($parametro->logo_path));
         }
 
         $parametro->delete();
@@ -109,7 +133,7 @@ class ParametroController extends Controller
     {
         return $request->validate([
             'nome_sistema' => 'required|string|max:255',
-            'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'logo' => 'nullable|image|mimes:jpeg,png,webp,svg|max:2048',
             'cor_primaria' => 'required|string|max:7',
             'cor_secundaria' => 'required|string|max:7',
             'cor_fundo' => 'required|string|max:7',

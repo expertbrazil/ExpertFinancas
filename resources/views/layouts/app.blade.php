@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'Expert Finanças') }}</title>
+    <title>{{ $parametros->nome_sistema ?? config('app.name', 'Expert Finanças') }}</title>
     
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,6 +20,27 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/custom-colors.css') }}">
+
+    <style>
+        :root {
+            --primary-color: {{ $parametros->cor_primaria ?? '#0d6efd' }};
+            --secondary-color: {{ $parametros->cor_secundaria ?? '#6c757d' }};
+            --background-color: {{ $parametros->cor_fundo ?? '#ffffff' }};
+            --text-color: {{ $parametros->cor_texto ?? '#212529' }};
+            --navbar-color: {{ $parametros->cor_navbar ?? '#212529' }};
+            --footer-color: {{ $parametros->cor_footer ?? '#212529' }};
+        }
+        .navbar-custom {
+            background-color: var(--navbar-color) !important;
+        }
+        .footer-custom {
+            background-color: var(--footer-color) !important;
+        }
+        .logo-img {
+            max-height: 40px;
+            width: auto;
+        }
+    </style>
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -29,10 +50,17 @@
     
     @stack('styles')
 </head>
-<body class="d-flex flex-column min-vh-100">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<body class="d-flex flex-column min-vh-100" style="background-color: var(--background-color); color: var(--text-color);">
+    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
         <div class="container">
-            <a class="navbar-brand" href="/">Expert Finanças</a>
+            <a class="navbar-brand" href="/">
+                @if($parametros && $parametros->logo_path && file_exists(public_path($parametros->logo_path)))
+                    <img src="/{{ $parametros->logo_path }}" alt="Logo" style="max-width: 200px; height: auto;">
+                    <div class="text-white mt-2" style="font-size: 14px;">{{ $parametros->nome_sistema }}</div>
+                @else
+                    <span class="text-white" style="font-size: 14px;">{{ $parametros ? $parametros->nome_sistema : 'Expert Finanças' }}</span>
+                @endif
+            </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -71,20 +99,39 @@
         @yield('content')
     </main>
 
-    <footer class="footer mt-auto py-3 bg-dark text-light">
+    <footer class="footer mt-auto py-3 footer-custom text-light">
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h6 class="mb-2">Desenvolvido por</h6>
-                    <p class="mb-0">Robson Jones Romanquio</p>
-                    <small class="text-muted">ExpertBrazil WEB</small>
+                    @if($parametros->texto_rodape)
+                        {!! $parametros->texto_rodape !!}
+                    @else
+                        <h6 class="mb-2">Desenvolvido por</h6>
+                        <p class="mb-0">Robson Jones Romanquio</p>
+                        <small class="text-muted">ExpertBrazil WEB</small>
+                    @endif
                 </div>
                 <div class="col-md-6 text-md-end">
+                    @if($parametros->email_contato || $parametros->telefone_contato)
+                        <p class="mb-2">
+                            @if($parametros->email_contato)
+                                <a href="mailto:{{ $parametros->email_contato }}" class="text-light text-decoration-none">
+                                    <i class="fas fa-envelope me-1"></i>{{ $parametros->email_contato }}
+                                </a>
+                            @endif
+                            @if($parametros->telefone_contato)
+                                <br>
+                                <a href="tel:{{ preg_replace('/[^0-9]/', '', $parametros->telefone_contato) }}" class="text-light text-decoration-none">
+                                    <i class="fas fa-phone me-1"></i>{{ $parametros->telefone_contato }}
+                                </a>
+                            @endif
+                        </p>
+                    @endif
                     <p class="mb-0">
                         <small class="text-muted">Versão 1.0</small>
                     </p>
                     <p class="mb-0">
-                        <small class="text-muted">&copy; {{ date('Y') }} Todos os direitos reservados</small>
+                        <small class="text-muted">&copy; {{ date('Y') }} {{ $parametros->nome_sistema ?? 'Todos os direitos reservados' }}</small>
                     </p>
                 </div>
             </div>

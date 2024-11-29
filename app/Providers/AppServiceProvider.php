@@ -19,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        view()->composer('*', function ($view) {
+            $parametros = \App\Models\Parametro::getAtivo();
+            $view->with('parametros', $parametros);
+        });
     }
 }

@@ -24,24 +24,7 @@ class Parametro extends Model
         'texto_rodape',
     ];
 
-    /**
-     * Obtém a configuração ativa do sistema
-     */
-    public static function getAtivo()
-    {
-        return static::firstOrCreate(
-            [],
-            [
-                'nome_sistema' => 'Expert Finanças',
-                'cor_primaria' => '#0d6efd',
-                'cor_secundaria' => '#6c757d',
-                'cor_fundo' => '#ffffff',
-                'cor_texto' => '#212529',
-                'cor_navbar' => '#212529',
-                'cor_footer' => '#212529'
-            ]
-        );
-    }
+    protected $appends = ['logo_url'];
 
     /**
      * Obtém a URL da logo
@@ -49,7 +32,7 @@ class Parametro extends Model
     public function getLogoUrlAttribute()
     {
         if ($this->logo_path) {
-            return Storage::url($this->logo_path);
+            return Storage::disk('public')->url($this->logo_path);
         }
         return null;
     }
@@ -92,5 +75,24 @@ class Parametro extends Model
                 border-color: var(--secondary-color);
             }
         ";
+    }
+
+    /**
+     * Obtém a configuração ativa do sistema
+     */
+    public static function getAtivo()
+    {
+        return static::first() ?? static::create([
+            'nome_sistema' => 'Expert Finanças',
+            'cor_primaria' => '#007bff',
+            'cor_secundaria' => '#6c757d',
+            'cor_fundo' => '#ffffff',
+            'cor_texto' => '#212529',
+            'cor_navbar' => '#343a40',
+            'cor_footer' => '#f8f9fa',
+            'email_contato' => null,
+            'telefone_contato' => null,
+            'texto_rodape' => null,
+        ]);
     }
 }

@@ -1,8 +1,10 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\ParametroController;
+use App\Http\Controllers\HomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,18 +17,26 @@ use App\Http\Controllers\ParametroController;
 |
 */
 
-Route::get('/', function () {
-    return redirect()->route('clientes.index');
-});
-
-Route::resource('clientes', ClienteController::class);
-
-Route::get('/validacao-cpf', function () {
-    return view('validacao-cpf');
-});
+Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
+    Route::get('/', function () {
+        return redirect()->route('clientes.index');
+    });
+
+    Route::resource('clientes', ClienteController::class);
+
+    Route::get('/validacao-cpf', function () {
+        return view('validacao-cpf');
+    });
+
     // Rotas de Parametrização
     Route::get('/parametros', [ParametroController::class, 'edit'])->name('parametros.edit');
     Route::put('/parametros', [ParametroController::class, 'update'])->name('parametros.update');
 });
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+Auth::routes();
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
