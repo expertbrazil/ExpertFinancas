@@ -1,0 +1,132 @@
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    background-color: var(--navbar-color);
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-brand img {
+    max-width: 160px;
+    height: auto;
+}
+
+.sidebar-menu {
+    padding: 0;
+    list-style: none;
+    margin-top: 20px;
+}
+
+.sidebar-menu li {
+    margin-bottom: 5px;
+}
+
+.sidebar-menu li a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+    transition: all 0.3s;
+    font-size: 14px;
+}
+
+.sidebar-menu li a:hover {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu li a i {
+    margin-right: 10px;
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar-submenu {
+    list-style: none;
+    padding-left: 34px;
+    display: none;
+}
+
+.sidebar-submenu.show {
+    display: block;
+}
+
+.sidebar-menu li a[data-bs-toggle="collapse"] {
+    position: relative;
+}
+
+.sidebar-menu li a[data-bs-toggle="collapse"]::after {
+    content: '\f107';
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.3s;
+}
+
+.sidebar-menu li a[data-bs-toggle="collapse"][aria-expanded="true"]::after {
+    transform: translateY(-50%) rotate(180deg);
+}
+
+.main-content {
+    margin-left: 250px;
+    padding: 20px;
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+
+.card-dashboard {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: transform 0.2s;
+}
+
+.card-dashboard:hover {
+    transform: translateY(-5px);
+}
+
+.card-dashboard .card-body {
+    padding: 1.5rem;
+}
+
+.card-dashboard .icon-box {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.card-dashboard .icon-box i {
+    font-size: 24px;
+    color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        margin-left: -250px;
+    }
+    .sidebar.active {
+        margin-left: 0;
+    }
+    .main-content {
+        margin-left: 0;
+    }
+    .main-content.active {
+        margin-left: 250px;
+    }
+}

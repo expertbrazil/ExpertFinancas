@@ -20,6 +20,7 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/custom-colors.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
 
     <style>
         :root {
@@ -29,16 +30,6 @@
             --text-color: {{ $parametros->cor_texto ?? '#212529' }};
             --navbar-color: {{ $parametros->cor_navbar ?? '#212529' }};
             --footer-color: {{ $parametros->cor_footer ?? '#212529' }};
-        }
-        .navbar-custom {
-            background-color: var(--navbar-color) !important;
-        }
-        .footer-custom {
-            background-color: var(--footer-color) !important;
-        }
-        .logo-img {
-            max-height: 40px;
-            width: auto;
         }
     </style>
     
@@ -51,35 +42,82 @@
     @stack('styles')
 </head>
 <body class="d-flex flex-column min-vh-100" style="background-color: var(--background-color); color: var(--text-color);">
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-        <div class="container">
-            <a class="navbar-brand" href="/">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <a href="/" class="sidebar-brand d-flex align-items-center">
                 @if($parametros && $parametros->logo_path && file_exists(public_path($parametros->logo_path)))
-                    <img src="/{{ $parametros->logo_path }}" alt="Logo" style="max-width: 200px; height: auto;">
-                    <div class="text-white mt-2" style="font-size: 14px;">{{ $parametros->nome_sistema }}</div>
+                    <img src="/{{ $parametros->logo_path }}" alt="Logo" class="img-fluid">
                 @else
-                    <span class="text-white" style="font-size: 14px;">{{ $parametros ? $parametros->nome_sistema : 'Expert Finanças' }}</span>
+                    <span class="text-white">{{ $parametros->nome_sistema ?? 'Expert Finanças' }}</span>
                 @endif
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('clientes.index') }}">Clientes</a>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li>
+                <a href="{{ route('home') }}">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+            </li>
+
+            <li>
+                <a href="#cadastrosSubmenu" data-bs-toggle="collapse" aria-expanded="false">
+                    <i class="fas fa-folder"></i> Cadastros
+                </a>
+                <ul class="sidebar-submenu collapse" id="cadastrosSubmenu">
+                    <li>
+                        <a href="{{ route('clientes.index') }}">
+                            <i class="fas fa-users"></i> Clientes/Fornecedores
+                        </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('parametros.edit') }}">
-                            <i class="fas fa-cogs"></i> Configurações
+                    <li>
+                        <a href="{{ route('servicos.index') }}">
+                            <i class="fas fa-concierge-bell"></i> Serviços
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('produtos.index') }}">
+                            <i class="fas fa-box"></i> Produtos
                         </a>
                     </li>
                 </ul>
-            </div>
-        </div>
+            </li>
+
+            <li>
+                <a href="#financeiroSubmenu" data-bs-toggle="collapse" aria-expanded="false">
+                    <i class="fas fa-dollar-sign"></i> Financeiro
+                </a>
+                <ul class="sidebar-submenu collapse" id="financeiroSubmenu">
+                    <li>
+                        <a href="{{ route('contas-pagar.index') }}">
+                            <i class="fas fa-money-bill-alt"></i> Contas a Pagar
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('contas-receber.index') }}">
+                            <i class="fas fa-hand-holding-usd"></i> Contas a Receber
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="{{ route('planos.index') }}">
+                    <i class="fas fa-server"></i> Planos de Hospedagens
+                </a>
+            </li>
+
+            <li>
+                <a href="{{ route('parametros.edit') }}">
+                    <i class="fas fa-cogs"></i> Configurações
+                </a>
+            </li>
+        </ul>
     </nav>
 
-    <main class="container my-4 flex-grow-1">
+    <!-- Main Content -->
+    <div class="main-content">
         @if(session('success'))
             <div class="alert alert-success">
                 {{ session('success') }}
@@ -97,46 +135,7 @@
         @endif
 
         @yield('content')
-    </main>
-
-    <footer class="footer mt-auto py-3 footer-custom text-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    @if($parametros->texto_rodape)
-                        {!! $parametros->texto_rodape !!}
-                    @else
-                        <h6 class="mb-2">Desenvolvido por</h6>
-                        <p class="mb-0">Robson Jones Romanquio</p>
-                        <small class="text-muted">ExpertBrazil WEB</small>
-                    @endif
-                </div>
-                <div class="col-md-6 text-md-end">
-                    @if($parametros->email_contato || $parametros->telefone_contato)
-                        <p class="mb-2">
-                            @if($parametros->email_contato)
-                                <a href="mailto:{{ $parametros->email_contato }}" class="text-light text-decoration-none">
-                                    <i class="fas fa-envelope me-1"></i>{{ $parametros->email_contato }}
-                                </a>
-                            @endif
-                            @if($parametros->telefone_contato)
-                                <br>
-                                <a href="tel:{{ preg_replace('/[^0-9]/', '', $parametros->telefone_contato) }}" class="text-light text-decoration-none">
-                                    <i class="fas fa-phone me-1"></i>{{ $parametros->telefone_contato }}
-                                </a>
-                            @endif
-                        </p>
-                    @endif
-                    <p class="mb-0">
-                        <small class="text-muted">Versão 1.0</small>
-                    </p>
-                    <p class="mb-0">
-                        <small class="text-muted">&copy; {{ date('Y') }} {{ $parametros->nome_sistema ?? 'Todos os direitos reservados' }}</small>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </footer>
+    </div>
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
