@@ -15,6 +15,7 @@ use App\Http\Controllers\RelatorioController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserRegistrationController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\HostingPlanController;
 
 /*
 |--------------------------------------------------------------------------
@@ -49,7 +50,9 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('contas-receber/{conta}/status', [ContaReceberController::class, 'updateStatus'])->name('contas-receber.status');
 
     // Planos de Hospedagem
-    Route::resource('planos', PlanoHospedagemController::class);
+    Route::resource('planos', HostingPlanController::class);
+    Route::patch('planos/{plano}/toggle-status', [HostingPlanController::class, 'toggleStatus'])
+        ->name('planos.toggle-status');
 
     // Gerenciamento de Usuários
     Route::get('/users/create', [UserRegistrationController::class, 'create'])->name('users.create');

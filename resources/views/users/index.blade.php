@@ -51,27 +51,27 @@
                                         {{ $user->ativo ? 'Ativo' : 'Inativo' }}
                                     </span>
                                 </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <div class="flex items-center gap-2">
+                                <td class="text-end">
+                                    <div class="btn-group">
+                                        <a href="{{ route('users.edit', $user) }}" class="btn btn-sm btn-primary d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Editar Usuário">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="{{ route('users.password.edit', $user) }}" class="btn btn-sm btn-warning d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Alterar Senha">
+                                            <i class="fas fa-key"></i>
+                                        </a>
                                         @if($user->email !== 'root@expertfinancas.com.br')
-                                            <a href="{{ route('users.edit', $user) }}" class="text-blue-600 hover:text-blue-900">
-                                                <img src="{{ asset('images/edit.svg') }}" alt="Editar Usuário" title="Editar Usuário" class="w-8 h-8">
-                                            </a>
-                                            <a href="{{ route('users.password.edit', $user) }}" class="text-yellow-600 hover:text-yellow-900">
-                                                <img src="{{ asset('images/key.svg') }}" alt="Alterar Senha" title="Alterar Senha" class="w-8 h-8">
-                                            </a>
-                                            <form action="{{ route('users.toggle-status', $user) }}" method="POST" class="inline">
+                                            <form action="{{ route('users.toggle-status', $user) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('PATCH')
-                                                <button type="submit" class="text-{{ $user->ativo ? 'red' : 'green' }}-600 hover:text-{{ $user->ativo ? 'red' : 'green' }}-900" title="{{ $user->ativo ? 'Desativar' : 'Ativar' }}">
-                                                    <img src="{{ asset('images/' . ($user->ativo ? 'ban' : 'check') . '.svg') }}" alt="{{ $user->ativo ? 'Desativar' : 'Ativar' }}" class="w-8 h-8">
+                                                <button type="submit" class="btn btn-sm btn-{{ $user->ativo ? 'danger' : 'success' }} d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="{{ $user->ativo ? 'Desativar Usuário' : 'Ativar Usuário' }}">
+                                                    <i class="fas fa-{{ $user->ativo ? 'ban' : 'check' }}"></i>
                                                 </button>
                                             </form>
-                                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="inline">
+                                            <form action="{{ route('users.destroy', $user) }}" method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="text-red-600 hover:text-red-900" onclick="return confirm('Tem certeza que deseja excluir este usuário?')" title="Excluir Usuário">
-                                                    <img src="{{ asset('images/trash.svg') }}" alt="Excluir Usuário" class="w-8 h-8">
+                                                <button type="submit" class="btn btn-sm btn-danger d-inline-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" onclick="return confirm('Tem certeza que deseja excluir este usuário?')" title="Excluir Usuário">
+                                                    <i class="fas fa-trash"></i>
                                                 </button>
                                             </form>
                                         @endif

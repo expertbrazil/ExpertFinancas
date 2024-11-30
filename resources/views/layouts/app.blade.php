@@ -88,6 +88,12 @@
             </li>
 
             <li>
+                <a href="{{ route('planos.index') }}">
+                    <i class="fas fa-server"></i> Planos de Hospedagem
+                </a>
+            </li>
+
+            <li>
                 <a href="#financeiroSubmenu" data-bs-toggle="collapse" aria-expanded="false">
                     <i class="fas fa-dollar-sign"></i> Financeiro
                 </a>
@@ -103,12 +109,6 @@
                         </a>
                     </li>
                 </ul>
-            </li>
-
-            <li>
-                <a href="{{ route('planos.index') }}">
-                    <i class="fas fa-server"></i> Planos de Hospedagens
-                </a>
             </li>
 
             <li>

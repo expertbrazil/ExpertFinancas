@@ -65,6 +65,22 @@ class Categoria extends Model
     }
 
     /**
+     * Obtém os produtos desta categoria
+     */
+    public function produtos()
+    {
+        return $this->hasMany(Produto::class);
+    }
+
+    /**
+     * Obtém os serviços desta categoria
+     */
+    public function servicos()
+    {
+        return $this->hasMany(Servico::class);
+    }
+
+    /**
      * Verifica se a categoria tem subcategorias
      */
     public function temSubcategorias()
@@ -94,5 +110,80 @@ class Categoria extends Model
         }
         
         return implode(' > ', $caminho);
+    }
+
+    /**
+     * Verifica se esta categoria pode ser pai de outra
+     */
+    public function podeSerPaiDe(Categoria $outraCategoria)
+    {
+        // Não pode ser pai de si mesma
+        if ($this->id === $outraCategoria->id) {
+            return false;
+        }
+
+        // Não pode ser pai de uma categoria de tipo diferente
+        if ($this->tipo !== $outraCategoria->tipo) {
+            return false;
+        }
+
+        // Não pode ser pai se já é descendente da outra categoria
+        $categoriaPai = $this->categoriaPai;
+        while ($categoriaPai) {
+            if ($categoriaPai->id === $outraCategoria->id) {
+                return false;
+            }
+            $categoriaPai = $categoriaPai->categoriaPai;
+        }
+
+        return true;
+    }
+
+    /**
+     * Obtém o nível hierárquico da categoria
+     */
+    public function getNivelHierarquicoAttribute()
+    {
+        $nivel = 0;
+        $categoria = $this;
+        
+        while ($categoria->categoriaPai) {
+            $nivel++;
+            $categoria = $categoria->categoriaPai;
+        }
+        
+        return $nivel;
+    }
+
+    /**
+     * Obtém todas as categorias ancestrais
+     */
+    public function getAncestraisAttribute()
+    {
+        $ancestrais = collect();
+        $categoria = $this->categoriaPai;
+        
+        while ($categoria) {
+            $ancestrais->push($categoria);
+            $categoria = $categoria->categoriaPai;
+        }
+        
+        return $ancestrais;
+    }
+
+    /**
+     * Verifica se esta categoria é ancestral de outra
+     */
+    public function isAncestralDe(Categoria $outraCategoria)
+    {
+        return $outraCategoria->ancestrais->contains('id', $this->id);
+    }
+
+    /**
+     * Verifica se esta categoria é descendente de outra
+     */
+    public function isDescendenteDe(Categoria $outraCategoria)
+    {
+        return $this->ancestrais->contains('id', $outraCategoria->id);
     }
 }
