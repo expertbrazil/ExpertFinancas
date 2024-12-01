@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,8 +21,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
-        'ativo',
-        'profile_photo'
+        'cliente_id'
     ];
 
     /**
@@ -44,8 +42,47 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'ativo' => 'boolean',
     ];
+
+    /**
+     * Get the client that owns the user.
+     */
+    public function cliente()
+    {
+        return $this->belongsTo(Cliente::class);
+    }
+
+    /**
+     * Check if user has a specific permission through their role
+     */
+    public function hasPermission($permission)
+    {
+        return $this->role ? $this->role->hasPermission($permission) : false;
+    }
+
+    /**
+     * Check if user has any of the given permissions through their role
+     */
+    public function hasAnyPermission(array $permissions)
+    {
+        return $this->role ? $this->role->hasAnyPermission($permissions) : false;
+    }
+
+    /**
+     * Check if user has all of the given permissions through their role
+     */
+    public function hasAllPermissions(array $permissions)
+    {
+        return $this->role ? $this->role->hasAllPermissions($permissions) : false;
+    }
+
+    /**
+     * Check if user is admin
+     */
+    public function isAdmin()
+    {
+        return $this->role ? $this->role->isAdmin() : false;
+    }
 
     /**
      * The "booting" method of the model.
@@ -70,17 +107,6 @@ class User extends Authenticatable
     }
 
     /**
-     * Get the user's profile photo URL.
-     */
-    public function getProfilePhotoUrlAttribute()
-    {
-        if ($this->profile_photo && file_exists(public_path($this->profile_photo))) {
-            return asset($this->profile_photo);
-        }
-        return asset('images/default-avatar.png');
-    }
-
-    /**
      * Get the role that owns the user.
      */
     public function role()
@@ -89,10 +115,29 @@ class User extends Authenticatable
     }
 
     /**
+     * Check if user is user
+     */
+    public function isUser()
+    {
+        return $this->role && $this->role->isUser();
+    }
+
+    /**
      * Check if user has a specific role
      */
     public function hasRole($roleName)
     {
         return $this->role->name === $roleName;
+    }
+
+    /**
+     * Get the user's profile photo URL.
+     */
+    public function getProfilePhotoUrlAttribute()
+    {
+        if ($this->profile_photo && file_exists(public_path($this->profile_photo))) {
+            return asset($this->profile_photo);
+        }
+        return asset('images/default-avatar.png');
     }
 }
