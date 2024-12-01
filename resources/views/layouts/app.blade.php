@@ -20,10 +20,7 @@
     <!-- App CSS -->
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     <link rel="stylesheet" href="{{ asset('css/custom-colors.css') }}">
-    @auth
-    <link rel="stylesheet" href="{{ asset('css/sidebar.css') }}">
-    @endauth
-
+    
     <style>
         :root {
             --primary-color: {{ $parametros->cor_primaria ?? '#0d6efd' }};
@@ -33,98 +30,87 @@
             --navbar-color: {{ $parametros->cor_navbar ?? '#212529' }};
             --footer-color: {{ $parametros->cor_footer ?? '#212529' }};
         }
+
+        body {
+            overflow-x: hidden;
+        }
+
+        #layoutSidenav {
+            display: flex;
+        }
+
+        #layoutSidenav_nav {
+            flex-basis: 225px;
+            flex-shrink: 0;
+            transition: transform .15s ease-in-out;
+            z-index: 1038;
+            transform: translateX(0);
+        }
+
+        #layoutSidenav_content {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-width: 0;
+            flex-grow: 1;
+            min-height: calc(100vh - 56px);
+            margin-left: 225px;
+        }
+
+        @media (max-width: 991.98px) {
+            #layoutSidenav_nav {
+                transform: translateX(-225px);
+            }
+            
+            #layoutSidenav_content {
+                margin-left: 0;
+            }
+            
+            .sb-sidenav-toggled #layoutSidenav_nav {
+                transform: translateX(0);
+            }
+            
+            .sb-sidenav-toggled #layoutSidenav_content {
+                margin-left: 225px;
+            }
+        }
     </style>
-    
-    <!-- jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    
-    <!-- jQuery Mask Plugin -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
     
     @stack('styles')
 </head>
-<body class="d-flex flex-column min-vh-100" style="background-color: var(--background-color); color: var(--text-color);">
+<body class="sb-nav-fixed">
     @auth
-    <!-- Sidebar -->
-    <nav class="sidebar">
-        <div class="sidebar-header">
-            <a href="/" class="sidebar-brand d-flex align-items-center">
-                @if($parametros && $parametros->logo_path && file_exists(public_path($parametros->logo_path)))
-                    <img src="/{{ $parametros->logo_path }}" alt="Logo" class="img-fluid">
-                @else
-                    <span class="text-white">{{ $parametros->nome_sistema ?? 'Expert Finanças' }}</span>
-                @endif
-            </a>
+    <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
+        <!-- Navbar Brand-->
+        <a class="navbar-brand ps-3" href="/">
+            @if($parametros && $parametros->logo_path && file_exists(public_path($parametros->logo_path)))
+                <img src="/{{ $parametros->logo_path }}" alt="Logo" height="30">
+            @else
+                {{ $parametros->nome_sistema ?? 'Expert Finanças' }}
+            @endif
+        </a>
+        <!-- Sidebar Toggle-->
+        <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!">
+            <i class="fas fa-bars"></i>
+        </button>
+        <!-- Navbar Search-->
+        <div class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
         </div>
-
-        <ul class="sidebar-menu">
-            <li>
-                <a href="{{ route('home') }}">
-                    <i class="fas fa-home"></i> Dashboard
+        <!-- Navbar-->
+        <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user fa-fw"></i>
                 </a>
-            </li>
-
-            <li>
-                <a href="#cadastrosSubmenu" data-bs-toggle="collapse" aria-expanded="false">
-                    <i class="fas fa-folder"></i> Cadastros
-                </a>
-                <ul class="sidebar-submenu collapse" id="cadastrosSubmenu">
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Perfil</a></li>
+                    <li><hr class="dropdown-divider" /></li>
                     <li>
-                        <a href="{{ route('clientes.index') }}">
-                            <i class="fas fa-users"></i> Clientes/Fornecedores
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('servicos.index') }}">
-                            <i class="fas fa-concierge-bell"></i> Serviços
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('produtos.index') }}">
-                            <i class="fas fa-box"></i> Produtos
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li>
-                <a href="{{ route('planos.index') }}">
-                    <i class="fas fa-server"></i> Planos de Hospedagem
-                </a>
-            </li>
-
-            <li>
-                <a href="#financeiroSubmenu" data-bs-toggle="collapse" aria-expanded="false">
-                    <i class="fas fa-dollar-sign"></i> Financeiro
-                </a>
-                <ul class="sidebar-submenu collapse" id="financeiroSubmenu">
-                    <li>
-                        <a href="{{ route('contas-pagar.index') }}">
-                            <i class="fas fa-money-bill-alt"></i> Contas a Pagar
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('contas-receber.index') }}">
-                            <i class="fas fa-hand-holding-usd"></i> Contas a Receber
-                        </a>
-                    </li>
-                </ul>
-            </li>
-
-            <li>
-                <a href="#parametrosSubmenu" data-bs-toggle="collapse" aria-expanded="false">
-                    <i class="fas fa-cogs"></i> Parâmetros
-                </a>
-                <ul class="sidebar-submenu collapse" id="parametrosSubmenu">
-                    <li>
-                        <a href="{{ route('users.index') }}">
-                            <i class="fas fa-users"></i> Usuários
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{{ route('parametros.edit') }}">
-                            <i class="fas fa-wrench"></i> Configurações
-                        </a>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="dropdown-item">Sair</button>
+                        </form>
                     </li>
                 </ul>
             </li>
@@ -132,32 +118,76 @@
     </nav>
     @endauth
 
-    <!-- Main Content -->
-    <div class="main-content {{ !Auth::check() ? 'w-100' : '' }}">
-        @if(session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
+    <div id="layoutSidenav">
+        @auth
+            @include('layouts.sidebar')
+        @endauth
 
-        @if($errors->any())
-            <div class="alert alert-danger">
-                <ul class="mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+        <div id="layoutSidenav_content">
+            <main>
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show m-4" role="alert">
+                        {{ session('success') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
 
-        @yield('content')
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+                        {{ session('error') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @if($errors->any())
+                    <div class="alert alert-danger alert-dismissible fade show m-4" role="alert">
+                        <ul class="mb-0">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
+
+                @yield('content')
+            </main>
+
+            <footer class="py-4 bg-light mt-auto">
+                <div class="container-fluid px-4">
+                    <div class="d-flex align-items-center justify-content-between small">
+                        <div class="text-muted">Copyright &copy; {{ $parametros->nome_sistema ?? 'Expert Finanças' }} {{ date('Y') }}</div>
+                    </div>
+                </div>
+            </footer>
+        </div>
     </div>
 
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- jQuery Mask Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+    
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
     <!-- App JS -->
     <script src="{{ asset('js/app.js') }}" defer></script>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', event => {
+            // Toggle the side navigation
+            const sidebarToggle = document.body.querySelector('#sidebarToggle');
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', event => {
+                    event.preventDefault();
+                    document.body.classList.toggle('sb-sidenav-toggled');
+                    localStorage.setItem('sb|sidebar-toggle', document.body.classList.contains('sb-sidenav-toggled'));
+                });
+            }
+        });
+    </script>
     
     @stack('scripts')
 </body>
