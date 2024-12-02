@@ -71,8 +71,12 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">CPF <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control cpf" name="cpf" 
-                                        value="{{ old('cpf', $cliente->cpf ?? '') }}">
+                                    <input type="text" class="form-control cpf @error('cpf') is-invalid @enderror" 
+                                        name="cpf" value="{{ old('cpf', $cliente->cpf ?? '') }}"
+                                        placeholder="000.000.000-00">
+                                    @error('cpf')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Data de Nascimento</label>
@@ -91,8 +95,12 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">CNPJ <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control cnpj" name="cnpj" 
-                                        value="{{ old('cnpj', $cliente->cnpj ?? '') }}">
+                                    <input type="text" class="form-control cnpj @error('cnpj') is-invalid @enderror" 
+                                        name="cnpj" value="{{ old('cnpj', $cliente->cnpj ?? '') }}"
+                                        placeholder="00.000.000/0000-00">
+                                    @error('cnpj')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Data de Fundação</label>
@@ -181,5 +189,6 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
-<script src="{{ asset('js/app.js') }}"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="{{ asset('js/clientes.js') }}"></script>
 @endpush
