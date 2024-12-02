@@ -5,6 +5,11 @@
     --text-color: #212529;
     --navbar-color: #343a40;
     --footer-color: #f8f9fa;
+    --primary: #007bff;
+    --success: #34c759;
+    --info: #17a2b8;
+    --warning: #ffc107;
+    --danger: #dc3545;
 }
 
 body {
@@ -102,4 +107,71 @@ a:hover {
 
 .nav-link:hover {
     color: var(--primary-color);
+}
+
+/* Status Colors */
+.status-pendente { color: var(--warning); }
+.status-aprovado { color: var(--success); }
+.status-rejeitado { color: var(--danger); }
+.status-em-analise { color: var(--info); }
+
+.bg-status-pendente { background-color: #fffbeb !important; }
+.bg-status-aprovado { background-color: #ecfdf5 !important; }
+.bg-status-rejeitado { background-color: #fef2f2 !important; }
+.bg-status-em-analise { background-color: #eff6ff !important; }
+
+/* Prioridade Colors */
+.prioridade-alta { color: var(--danger); }
+.prioridade-media { color: var(--warning); }
+.prioridade-baixa { color: var(--info); }
+
+.bg-prioridade-alta { background-color: #fef2f2 !important; }
+.bg-prioridade-media { background-color: #fffbeb !important; }
+.bg-prioridade-baixa { background-color: #eff6ff !important; }
+
+/* Cards Customizados */
+.card-dashboard {
+    border: none;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card-dashboard:hover {
+    transform: translateY(-5px);
+}
+
+.card-financeiro {
+    border-left: 4px solid var(--primary);
+}
+
+.card-clientes {
+    border-left: 4px solid var(--success);
+}
+
+.card-tickets {
+    border-left: 4px solid var(--warning);
+}
+
+.card-documentos {
+    border-left: 4px solid var(--info);
+}
+
+/* Gradientes */
+.bg-gradient-primary {
+    background: linear-gradient(45deg, var(--primary), var(--info));
+    color: white;
+}
+
+.bg-gradient-success {
+    background: linear-gradient(45deg, var(--success), #34d399);
+    color: white;
+}
+
+.bg-gradient-danger {
+    background: linear-gradient(45deg, var(--danger), #f87171);
+    color: white;
+}
+
+.bg-gradient-warning {
+    background: linear-gradient(45deg, var(--warning), #fbbf24);
+    color: white;
 }

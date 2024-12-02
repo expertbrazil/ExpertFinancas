@@ -22,8 +22,6 @@
         </div>
     </div>
 
-    @include('layouts.partials.alerts')
-
     <div class="row">
         <div class="col-md-8">
             <!-- Ticket Info -->

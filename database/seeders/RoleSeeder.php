@@ -3,74 +3,65 @@
 namespace Database\Seeders;
 
 use App\Models\Role;
+use App\Models\Permission;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class RoleSeeder extends Seeder
 {
     public function run()
     {
-        $roles = [
-            [
-                'name' => 'Administrador',
-                'slug' => 'admin',
-                'description' => 'Acesso total ao sistema',
-                'permissions' => [
-                    'users.view',
-                    'users.create',
-                    'users.edit',
-                    'users.delete',
-                    'finances.view',
-                    'finances.create',
-                    'finances.edit',
-                    'finances.delete',
-                    'reports.view',
-                    'reports.create',
-                    'reports.export',
-                    'tickets.admin',
-                    'clientes.manage'
-                ]
-            ],
-            [
-                'name' => 'Usuário',
-                'slug' => 'user',
-                'description' => 'Acesso limitado ao sistema',
-                'permissions' => [
-                    'finances.view',
-                    'finances.create',
-                    'finances.edit',
-                    'reports.view',
-                    'tickets.view',
-                    'tickets.respond'
-                ]
-            ],
-            [
-                'name' => 'Cliente',
-                'slug' => 'cliente',
-                'description' => 'Acesso ao portal do cliente',
-                'permissions' => [
-                    'dashboard.view',
-                    'faturas.view',
-                    'faturas.download',
-                    'documentos.view',
-                    'documentos.download',
-                    'tickets.create',
-                    'tickets.view',
-                    'tickets.respond',
-                    'perfil.edit'
-                ]
-            ]
+        // Criar papel de administrador
+        $adminRole = Role::create([
+            'name' => 'admin',
+            'description' => 'Administrador do sistema com acesso total'
+        ]);
+
+        // Criar todas as permissões
+        $permissions = [
+            // Financeiro
+            'financeiro.receitas',
+            'financeiro.despesas',
+            'financeiro.fluxo-caixa',
+            'financeiro.conciliacao',
+            
+            // Relatórios
+            'relatorios.clientes',
+            'relatorios.faturas',
+            'relatorios.tickets',
+            'relatorios.financeiro',
+            
+            // Configurações
+            'configuracoes.empresa',
+            'configuracoes.usuarios',
+            'configuracoes.permissoes',
+            'configuracoes.notificacoes',
+            'configuracoes.integracao',
+            'configuracoes.backup',
+            'configuracoes.logs',
+            
+            // Módulos existentes
+            'clientes.view',
+            'clientes.create',
+            'clientes.edit',
+            'clientes.delete',
+            'faturas.view',
+            'faturas.create',
+            'faturas.edit',
+            'faturas.delete',
+            'documentos.view',
+            'documentos.create',
+            'documentos.edit',
+            'documentos.delete'
         ];
 
-        foreach ($roles as $role) {
-            Role::firstOrCreate(
-                ['slug' => $role['slug']],
-                [
-                    'name' => $role['name'],
-                    'description' => $role['description'],
-                    'permissions' => $role['permissions']
-                ]
-            );
+        // Criar permissões e associar ao papel de admin
+        foreach ($permissions as $permissionName) {
+            $permission = Permission::create([
+                'name' => $permissionName,
+                'description' => 'Permissão para ' . str_replace('.', ' ', $permissionName)
+            ]);
+            
+            $adminRole->permissions()->attach($permission->id);
         }
     }
 }

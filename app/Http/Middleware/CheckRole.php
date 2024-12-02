@@ -21,6 +21,11 @@ class CheckRole
 
         $userRole = $request->user()->role->slug;
 
+        // Se for root, tem acesso total
+        if ($userRole === 'root') {
+            return $next($request);
+        }
+
         if (in_array($userRole, $roles)) {
             return $next($request);
         }

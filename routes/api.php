@@ -25,4 +25,13 @@ Route::middleware('auth:sanctum')->group(function () {
             'count' => \App\Models\Ticket::where('status', 'aberto')->count()
         ]);
     })->name('api.tickets.count');
+
+    // API Endpoints para Tickets
+    Route::prefix('tickets')->group(function () {
+        Route::get('/', [TicketController::class, 'apiIndex']);
+        Route::post('/', [TicketController::class, 'apiStore']);
+        Route::get('/{ticket}', [TicketController::class, 'apiShow']);
+        Route::post('/{ticket}/responder', [TicketController::class, 'apiResponder']);
+        Route::patch('/{ticket}/status', [TicketController::class, 'apiUpdateStatus']);
+    });
 });

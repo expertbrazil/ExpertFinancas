@@ -15,7 +15,12 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         // Garante que o papel 'root' existe
-        $rootRole = Role::firstOrCreate(['name' => 'root']);
+        $rootRole = Role::firstOrCreate([
+            'name' => 'root',
+            'slug' => 'root',
+            'description' => 'Administrador do Sistema',
+            'permissions' => ['*']
+        ]);
 
         // Criar ou atualizar o usuário admin
         User::updateOrCreate(
