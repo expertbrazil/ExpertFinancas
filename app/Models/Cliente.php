@@ -9,6 +9,9 @@ use App\Models\Assinatura;
 use App\Models\Ticket;
 use App\Models\Documento;
 use App\Models\Fatura;
+use App\Models\Endereco;
+use App\Models\Dominio;
+use App\Models\InscricaoEstadual;
 
 class Cliente extends Model
 {
@@ -28,13 +31,7 @@ class Cliente extends Model
         'email',
         'telefone',
         'celular',
-        'cep',
-        'logradouro',
-        'numero',
-        'complemento',
-        'bairro',
-        'cidade',
-        'uf'
+        'observacoes'
     ];
 
     protected $casts = [
@@ -83,13 +80,47 @@ class Cliente extends Model
         return $this->hasMany(Fatura::class);
     }
 
-    public function getIsJuridicoAttribute()
+    /**
+     * Get the addresses for the client.
+     */
+    public function enderecos()
+    {
+        return $this->hasMany(Endereco::class);
+    }
+
+    /**
+     * Get the domains for the client.
+     */
+    public function dominios()
+    {
+        return $this->hasMany(Dominio::class);
+    }
+
+    /**
+     * Get the state registrations for the client.
+     */
+    public function inscricoesEstaduais()
+    {
+        return $this->hasMany(InscricaoEstadual::class);
+    }
+
+    public function getIsPessoaFisicaAttribute()
+    {
+        return $this->tipo_pessoa === 'PF';
+    }
+
+    public function getIsPessoaJuridicaAttribute()
     {
         return $this->tipo_pessoa === 'PJ';
     }
 
-    public function getIsFisicoAttribute()
+    public function getDocumentoAttribute()
     {
-        return $this->tipo_pessoa === 'PF';
+        return $this->isPessoaFisica ? $this->cpf : $this->cnpj;
+    }
+
+    public function getNomeAttribute()
+    {
+        return $this->isPessoaFisica ? $this->nome_completo : $this->razao_social;
     }
 }

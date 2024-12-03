@@ -1,17 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-<script>
-    function confirmarCancelamento() {
-        // Se estiver editando (existe $cliente), mostra confirmação
-        @if(isset($cliente))
-            return confirm('Deseja realmente cancelar a edição?');
-        @else
-            return true; // Se for novo registro, não mostra confirmação
-        @endif
-    }
-</script>
-
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-12">
@@ -71,12 +60,9 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">CPF <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control cpf @error('cpf') is-invalid @enderror" 
-                                        name="cpf" value="{{ old('cpf', $cliente->cpf ?? '') }}"
+                                    <input type="text" class="form-control cpf" name="cpf" 
+                                        value="{{ old('cpf', $cliente->cpf ?? '') }}"
                                         placeholder="000.000.000-00">
-                                    @error('cpf')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
                                 </div>
                                 <div class="col-md-3">
                                     <label class="form-label">Data de Nascimento</label>
@@ -86,68 +72,31 @@
                             </div>
                         </div>
 
-                        <div id="pessoa_juridica" class="pessoa-fields" style="display:none;">
+                        <div id="pessoa_juridica" class="pessoa-fields">
                             <div class="row mb-3">
                                 <div class="col-md-6">
                                     <label class="form-label">Razão Social <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" name="razao_social" 
                                         value="{{ old('razao_social', $cliente->razao_social ?? '') }}">
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">CNPJ <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control cnpj @error('cnpj') is-invalid @enderror" 
-                                        name="cnpj" value="{{ old('cnpj', $cliente->cnpj ?? '') }}"
-                                        placeholder="00.000.000/0000-00">
-                                    @error('cnpj')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
+                                <div class="col-md-6">
+                                    <label class="form-label">Nome Fantasia</label>
+                                    <input type="text" class="form-control" name="nome_fantasia" 
+                                        value="{{ old('nome_fantasia', $cliente->nome_fantasia ?? '') }}">
                                 </div>
-                                <div class="col-md-3">
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">CNPJ <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control cnpj" name="cnpj" 
+                                        value="{{ old('cnpj', $cliente->cnpj ?? '') }}"
+                                        placeholder="00.000.000/0000-00">
+                                </div>
+                                <div class="col-md-4">
                                     <label class="form-label">Data de Fundação</label>
                                     <input type="date" class="form-control" name="data_fundacao" 
                                         value="{{ old('data_fundacao', isset($cliente) && $cliente->data_fundacao ? $cliente->data_fundacao->format('Y-m-d') : '') }}">
                                 </div>
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="cep" class="form-label">CEP</label>
-                                <input type="text" class="form-control cep" id="cep" name="cep" 
-                                    value="{{ old('cep', $cliente->cep ?? '') }}">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="logradouro" class="form-label">Logradouro</label>
-                                <input type="text" class="form-control" id="logradouro" name="logradouro" 
-                                    value="{{ old('logradouro', $cliente->logradouro ?? '') }}">
-                            </div>
-                            <div class="col-md-2">
-                                <label for="numero" class="form-label">Número</label>
-                                <input type="text" class="form-control" id="numero" name="numero" 
-                                    value="{{ old('numero', $cliente->numero ?? '') }}">
-                            </div>
-                        </div>
-
-                        <div class="row mb-3">
-                            <div class="col-md-4">
-                                <label for="complemento" class="form-label">Complemento</label>
-                                <input type="text" class="form-control" id="complemento" name="complemento" 
-                                    value="{{ old('complemento', $cliente->complemento ?? '') }}">
-                            </div>
-                            <div class="col-md-4">
-                                <label for="bairro" class="form-label">Bairro</label>
-                                <input type="text" class="form-control" id="bairro" name="bairro" 
-                                    value="{{ old('bairro', $cliente->bairro ?? '') }}">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="cidade" class="form-label">Cidade</label>
-                                <input type="text" class="form-control" id="cidade" name="cidade" 
-                                    value="{{ old('cidade', $cliente->cidade ?? '') }}">
-                            </div>
-                            <div class="col-md-1">
-                                <label for="uf" class="form-label">UF</label>
-                                <input type="text" class="form-control" id="uf" name="uf" maxlength="2" 
-                                    value="{{ old('uf', $cliente->uf ?? '') }}">
                             </div>
                         </div>
 
@@ -163,19 +112,117 @@
                                     value="{{ old('telefone', $cliente->telefone ?? '') }}">
                             </div>
                             <div class="col-md-4">
-                                <label for="celular" class="form-label">Celular <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control telefone" id="celular" name="celular" 
+                                <label for="celular" class="form-label">Celular</label>
+                                <input type="text" class="form-control celular" id="celular" name="celular" 
                                     value="{{ old('celular', $cliente->celular ?? '') }}">
                             </div>
                         </div>
 
-                        <div class="row mb-0">
-                            <div class="col-md-12 text-end">
-                                <a href="{{ route('clientes.index') }}" class="btn btn-secondary me-2" onclick="return confirmarCancelamento()">
-                                    <i class="fas fa-times me-2"></i>Cancelar
+                        <!-- Domínios -->
+                        <div class="card mt-4">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Domínios</h5>
+                                <button type="button" class="btn btn-primary btn-sm" id="addDominio">
+                                    <i class="fas fa-plus"></i> Adicionar Domínio
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="dominios-container">
+                                    @if(isset($cliente) && $cliente->dominios->count() > 0)
+                                        @foreach($cliente->dominios as $index => $dominio)
+                                            <div class="row dominio-row mb-3">
+                                                <div class="col-md-4">
+                                                    <label class="form-label">Nome do Domínio</label>
+                                                    <input type="text" class="form-control" name="dominios[{{ $index }}][nome_dominio]" 
+                                                        value="{{ $dominio->nome_dominio }}" required>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Data Registro</label>
+                                                    <input type="date" class="form-control" name="dominios[{{ $index }}][data_registro]" 
+                                                        value="{{ $dominio->data_registro?->format('Y-m-d') }}">
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <label class="form-label">Data Vencimento</label>
+                                                    <input type="date" class="form-control" name="dominios[{{ $index }}][data_vencimento]" 
+                                                        value="{{ $dominio->data_vencimento?->format('Y-m-d') }}">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Registrador</label>
+                                                    <input type="text" class="form-control" name="dominios[{{ $index }}][registrador]" 
+                                                        value="{{ $dominio->registrador }}">
+                                                </div>
+                                                <div class="col-md-1 d-flex align-items-end">
+                                                    <button type="button" class="btn btn-danger btn-sm remove-dominio">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inscrições Estaduais -->
+                        <div class="card mt-4" id="inscricoes-estaduais-card">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h5 class="card-title mb-0">Inscrições Estaduais</h5>
+                                <button type="button" class="btn btn-primary btn-sm" id="addInscricao">
+                                    <i class="fas fa-plus"></i> Adicionar Inscrição
+                                </button>
+                            </div>
+                            <div class="card-body">
+                                <div id="inscricoes-container">
+                                    @if(isset($cliente) && $cliente->inscricoesEstaduais->count() > 0)
+                                        @foreach($cliente->inscricoesEstaduais as $index => $inscricao)
+                                            <div class="row inscricao-row mb-3">
+                                                <div class="col-md-5">
+                                                    <label class="form-label">Número da Inscrição</label>
+                                                    <input type="text" class="form-control" name="inscricoes[{{ $index }}][numero_inscricao]" 
+                                                        value="{{ $inscricao->numero_inscricao }}" required>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">UF</label>
+                                                    <select class="form-select" name="inscricoes[{{ $index }}][uf]" required>
+                                                        <option value="">Selecione...</option>
+                                                        @foreach(['AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS','MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC','SP','SE','TO'] as $uf)
+                                                            <option value="{{ $uf }}" {{ $inscricao->uf == $uf ? 'selected' : '' }}>{{ $uf }}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <label class="form-label">Status</label>
+                                                    <select class="form-select" name="inscricoes[{{ $index }}][ativo]">
+                                                        <option value="1" {{ $inscricao->ativo ? 'selected' : '' }}>Ativo</option>
+                                                        <option value="0" {{ !$inscricao->ativo ? 'selected' : '' }}>Inativo</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-1 d-flex align-items-end">
+                                                    <button type="button" class="btn btn-danger btn-sm remove-inscricao">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <label for="observacoes" class="form-label">Observações</label>
+                                <textarea class="form-control" id="observacoes" name="observacoes" rows="3">{{ old('observacoes', $cliente->observacoes ?? '') }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <a href="{{ route('clientes.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
                                 </a>
                                 <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>{{ isset($cliente) ? 'Atualizar' : 'Salvar' }}
+                                    <i class="fas fa-save"></i> {{ isset($cliente) ? 'Atualizar' : 'Salvar' }}
                                 </button>
                             </div>
                         </div>
@@ -185,10 +232,10 @@
         </div>
     </div>
 </div>
-@endsection
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/clientes.js') }}"></script>
 @endpush
+@endsection

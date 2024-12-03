@@ -10,6 +10,7 @@ use App\Rules\ValidaCpf;
 use App\Rules\ValidaCnpj;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
 
 class ClienteController extends Controller
 {
@@ -42,58 +43,59 @@ class ClienteController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    protected function store(Request $request)
     {
-        // Regras base de validação
-        $rules = [
-            'tipo_pessoa' => ['required', Rule::in(TipoPessoa::getValues())],
+        $validated = $request->validate([
+            'tipo_pessoa' => 'required|in:PF,PJ',
+            'status' => 'boolean',
+            'nome_completo' => 'required_if:tipo_pessoa,PF',
+            'cpf' => 'required_if:tipo_pessoa,PF|unique:clientes,cpf',
+            'data_nascimento' => 'nullable|date',
+            'razao_social' => 'required_if:tipo_pessoa,PJ',
+            'cnpj' => 'required_if:tipo_pessoa,PJ|unique:clientes,cnpj',
+            'data_fundacao' => 'nullable|date',
             'email' => 'required|email|unique:clientes,email',
-            'telefone' => 'required',
-            'celular' => 'required',
-            'status' => ['required', Rule::in(StatusGeral::getValues())],
-            'cep' => 'nullable|size:9',
-            'logradouro' => 'nullable',
-            'numero' => 'nullable',
-            'complemento' => 'nullable',
-            'bairro' => 'nullable',
-            'cidade' => 'nullable',
-            'uf' => 'nullable|size:2',
-            'observacoes' => 'nullable',
-            'foto' => 'nullable|image|max:2048'
-        ];
-
-        // Regras específicas por tipo de pessoa
-        if ($request->tipo_pessoa === TipoPessoa::FISICA->value) {
-            $rules = array_merge($rules, [
-                'nome_completo' => 'required',
-                'cpf' => ['required', new ValidaCpf, 'unique:clientes,cpf'],
-                'data_nascimento' => 'nullable|date_format:Y-m-d',
-                'razao_social' => 'nullable',
-                'cnpj' => 'nullable',
-                'data_fundacao' => 'nullable'
-            ]);
-        } else {
-            $rules = array_merge($rules, [
-                'razao_social' => 'required',
-                'cnpj' => ['required', new ValidaCnpj, 'unique:clientes,cnpj'],
-                'data_fundacao' => 'nullable|date_format:Y-m-d',
-                'nome_completo' => 'nullable',
-                'cpf' => 'nullable',
-                'data_nascimento' => 'nullable'
-            ]);
-        }
-
-        $validated = $request->validate($rules);
+            'telefone' => 'nullable',
+            'celular' => 'nullable',
+            'dominios.*.nome_dominio' => 'required|string',
+            'dominios.*.data_registro' => 'nullable|date',
+            'dominios.*.data_vencimento' => 'nullable|date',
+            'dominios.*.registrador' => 'nullable|string',
+            'inscricoes.*.numero_inscricao' => 'required_if:tipo_pessoa,PF|string',
+            'inscricoes.*.uf' => 'required_if:tipo_pessoa,PF|string|size:2',
+            'inscricoes.*.ativo' => 'required_if:tipo_pessoa,PF|boolean'
+        ]);
 
         try {
-            $cliente = $this->clienteService->criar($validated);
-            $this->logCriacao('cliente', $cliente->id);
+            DB::beginTransaction();
 
+            // Criar cliente
+            $cliente = $this->clienteService->criar($validated);
+
+            // Processar domínios
+            if (!empty($request->dominios)) {
+                foreach ($request->dominios as $dominio) {
+                    $cliente->dominios()->create($dominio);
+                }
+            }
+
+            // Processar inscrições estaduais (apenas para PF)
+            if ($request->tipo_pessoa === 'PF' && !empty($request->inscricoes)) {
+                foreach ($request->inscricoes as $inscricao) {
+                    $cliente->inscricoesEstaduais()->create($inscricao);
+                }
+            }
+
+            DB::commit();
+
+            $this->logCriacao('cliente', $cliente->id);
             return redirect()->route('clientes.index')
                 ->with('success', 'Cliente cadastrado com sucesso!');
+
         } catch (\Exception $e) {
-            return back()->withInput()
-                ->with('error', 'Erro ao cadastrar cliente: ' . $e->getMessage());
+            DB::rollBack();
+            return back()->with('error', 'Erro ao cadastrar cliente: ' . $e->getMessage())
+                ->withInput();
         }
     }
 
@@ -108,60 +110,61 @@ class ClienteController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    protected function update(Request $request, $id)
     {
-        $cliente = $this->clienteService->buscar($id);
-
-        // Regras base de validação
-        $rules = [
-            'tipo_pessoa' => ['required', Rule::in(TipoPessoa::getValues())],
-            'email' => ['required', 'email', Rule::unique('clientes')->ignore($id)],
-            'telefone' => 'required',
-            'celular' => 'required',
-            'status' => ['required', Rule::in(StatusGeral::getValues())],
-            'cep' => 'nullable|size:9',
-            'logradouro' => 'nullable',
-            'numero' => 'nullable',
-            'complemento' => 'nullable',
-            'bairro' => 'nullable',
-            'cidade' => 'nullable',
-            'uf' => 'nullable|size:2',
-            'observacoes' => 'nullable',
-            'foto' => 'nullable|image|max:2048'
-        ];
-
-        // Regras específicas por tipo de pessoa
-        if ($request->tipo_pessoa === TipoPessoa::FISICA->value) {
-            $rules = array_merge($rules, [
-                'nome_completo' => 'required',
-                'cpf' => ['required', new ValidaCpf, Rule::unique('clientes')->ignore($id)],
-                'data_nascimento' => 'nullable|date_format:Y-m-d',
-                'razao_social' => 'nullable',
-                'cnpj' => 'nullable',
-                'data_fundacao' => 'nullable'
-            ]);
-        } else {
-            $rules = array_merge($rules, [
-                'razao_social' => 'required',
-                'cnpj' => ['required', new ValidaCnpj, Rule::unique('clientes')->ignore($id)],
-                'data_fundacao' => 'nullable|date_format:Y-m-d',
-                'nome_completo' => 'nullable',
-                'cpf' => 'nullable',
-                'data_nascimento' => 'nullable'
-            ]);
-        }
-
-        $validated = $request->validate($rules);
+        $validated = $request->validate([
+            'tipo_pessoa' => 'required|in:PF,PJ',
+            'status' => 'boolean',
+            'nome_completo' => 'required_if:tipo_pessoa,PF',
+            'cpf' => 'required_if:tipo_pessoa,PF|unique:clientes,cpf,' . $id,
+            'data_nascimento' => 'nullable|date',
+            'razao_social' => 'required_if:tipo_pessoa,PJ',
+            'cnpj' => 'required_if:tipo_pessoa,PJ|unique:clientes,cnpj,' . $id,
+            'data_fundacao' => 'nullable|date',
+            'email' => 'required|email|unique:clientes,email,' . $id,
+            'telefone' => 'nullable',
+            'celular' => 'nullable',
+            'dominios.*.nome_dominio' => 'required|string',
+            'dominios.*.data_registro' => 'nullable|date',
+            'dominios.*.data_vencimento' => 'nullable|date',
+            'dominios.*.registrador' => 'nullable|string',
+            'inscricoes.*.numero_inscricao' => 'required_if:tipo_pessoa,PF|string',
+            'inscricoes.*.uf' => 'required_if:tipo_pessoa,PF|string|size:2',
+            'inscricoes.*.ativo' => 'required_if:tipo_pessoa,PF|boolean'
+        ]);
 
         try {
-            $cliente = $this->clienteService->atualizar($id, $validated);
-            $this->logAtualizacao('cliente', $cliente->id);
+            DB::beginTransaction();
 
+            // Atualizar cliente
+            $cliente = $this->clienteService->atualizar($id, $validated);
+
+            // Atualizar domínios
+            $cliente->dominios()->delete(); // Remove domínios existentes
+            if (!empty($request->dominios)) {
+                foreach ($request->dominios as $dominio) {
+                    $cliente->dominios()->create($dominio);
+                }
+            }
+
+            // Atualizar inscrições estaduais (apenas para PF)
+            $cliente->inscricoesEstaduais()->delete(); // Remove inscrições existentes
+            if ($request->tipo_pessoa === 'PF' && !empty($request->inscricoes)) {
+                foreach ($request->inscricoes as $inscricao) {
+                    $cliente->inscricoesEstaduais()->create($inscricao);
+                }
+            }
+
+            DB::commit();
+
+            $this->logAtualizacao('cliente', $cliente->id);
             return redirect()->route('clientes.index')
                 ->with('success', 'Cliente atualizado com sucesso!');
+
         } catch (\Exception $e) {
-            return back()->withInput()
-                ->with('error', 'Erro ao atualizar cliente: ' . $e->getMessage());
+            DB::rollBack();
+            return back()->with('error', 'Erro ao atualizar cliente: ' . $e->getMessage())
+                ->withInput();
         }
     }
 
