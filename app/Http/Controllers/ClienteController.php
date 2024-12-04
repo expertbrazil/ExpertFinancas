@@ -45,57 +45,82 @@ class ClienteController extends Controller
 
     protected function store(Request $request)
     {
-        $validated = $request->validate([
+        $rules = [
             'tipo_pessoa' => 'required|in:PF,PJ',
             'status' => 'boolean',
-            'nome_completo' => 'required_if:tipo_pessoa,PF',
-            'cpf' => 'required_if:tipo_pessoa,PF|unique:clientes,cpf',
-            'data_nascimento' => 'nullable|date',
-            'razao_social' => 'required_if:tipo_pessoa,PJ',
-            'cnpj' => 'required_if:tipo_pessoa,PJ|unique:clientes,cnpj',
-            'data_fundacao' => 'nullable|date',
-            'email' => 'required|email|unique:clientes,email',
-            'telefone' => 'nullable',
-            'celular' => 'nullable',
-            'dominios.*.nome_dominio' => 'required|string',
-            'dominios.*.data_registro' => 'nullable|date',
-            'dominios.*.data_vencimento' => 'nullable|date',
-            'dominios.*.registrador' => 'nullable|string',
-            'inscricoes.*.numero_inscricao' => 'required_if:tipo_pessoa,PF|string',
-            'inscricoes.*.uf' => 'required_if:tipo_pessoa,PF|string|size:2',
-            'inscricoes.*.ativo' => 'required_if:tipo_pessoa,PF|boolean'
-        ]);
+            'email' => 'nullable|email',
+            'telefone' => 'nullable|string|max:15',
+            'celular' => 'nullable|string|max:15',
+            'cep' => 'nullable|string|size:9',
+            'logradouro' => 'nullable|string|max:100',
+            'numero' => 'nullable|string|max:10',
+            'complemento' => 'nullable|string|max:50',
+            'bairro' => 'nullable|string|max:50',
+            'cidade' => 'nullable|string|max:50',
+            'uf' => 'nullable|string|size:2',
+            'observacoes' => 'nullable|string|max:500',
+        ];
+
+        // Regras específicas para Pessoa Física
+        if ($request->input('tipo_pessoa') === 'PF') {
+            $rules = array_merge($rules, [
+                'nome_completo' => 'required|string|max:100',
+                'cpf' => ['required', 'string', 'size:14', new ValidaCpf],
+                'data_nascimento' => 'nullable|date',
+            ]);
+        }
+        // Regras específicas para Pessoa Jurídica
+        else {
+            $rules = array_merge($rules, [
+                'razao_social' => 'required|string|max:100',
+                'nome_fantasia' => 'nullable|string|max:100',
+                'cnpj' => ['required', 'string', 'size:18', new ValidaCnpj],
+            ]);
+        }
+
+        // Validação de domínios
+        if ($request->has('dominios')) {
+            $rules['dominios.*.dominio'] = [
+                'nullable',
+                'string',
+                'max:100',
+                'regex:/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/'
+            ];
+        }
+
+        // Validação de inscrições estaduais
+        if ($request->has('inscricoes')) {
+            $rules['inscricoes.*.uf'] = 'required|string|size:2';
+            $rules['inscricoes.*.inscricao'] = 'required|string|max:20';
+        }
+
+        $validated = $request->validate($rules);
 
         try {
             DB::beginTransaction();
-
-            // Criar cliente
+            
             $cliente = $this->clienteService->criar($validated);
-
-            // Processar domínios
-            if (!empty($request->dominios)) {
-                foreach ($request->dominios as $dominio) {
-                    $cliente->dominios()->create($dominio);
-                }
-            }
-
-            // Processar inscrições estaduais (apenas para PF)
-            if ($request->tipo_pessoa === 'PF' && !empty($request->inscricoes)) {
-                foreach ($request->inscricoes as $inscricao) {
-                    $cliente->inscricoesEstaduais()->create($inscricao);
-                }
-            }
+            
+            $this->logActivity(
+                'Cliente cadastrado com sucesso', 
+                'create', 
+                'cliente', 
+                $cliente->id
+            );
 
             DB::commit();
-
-            $this->logCriacao('cliente', $cliente->id);
-            return redirect()->route('clientes.index')
+            
+            return redirect()
+                ->route('clientes.index')
                 ->with('success', 'Cliente cadastrado com sucesso!');
-
+                
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Erro ao cadastrar cliente: ' . $e->getMessage())
-                ->withInput();
+            
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Erro ao cadastrar cliente: ' . $e->getMessage());
         }
     }
 
@@ -110,74 +135,112 @@ class ClienteController extends Controller
         ]);
     }
 
-    protected function update(Request $request, $id)
+    public function update(Request $request, $id)
     {
-        $validated = $request->validate([
+        $rules = [
             'tipo_pessoa' => 'required|in:PF,PJ',
             'status' => 'boolean',
-            'nome_completo' => 'required_if:tipo_pessoa,PF',
-            'cpf' => 'required_if:tipo_pessoa,PF|unique:clientes,cpf,' . $id,
-            'data_nascimento' => 'nullable|date',
-            'razao_social' => 'required_if:tipo_pessoa,PJ',
-            'cnpj' => 'required_if:tipo_pessoa,PJ|unique:clientes,cnpj,' . $id,
-            'data_fundacao' => 'nullable|date',
-            'email' => 'required|email|unique:clientes,email,' . $id,
-            'telefone' => 'nullable',
-            'celular' => 'nullable',
-            'dominios.*.nome_dominio' => 'required|string',
-            'dominios.*.data_registro' => 'nullable|date',
-            'dominios.*.data_vencimento' => 'nullable|date',
-            'dominios.*.registrador' => 'nullable|string',
-            'inscricoes.*.numero_inscricao' => 'required_if:tipo_pessoa,PF|string',
-            'inscricoes.*.uf' => 'required_if:tipo_pessoa,PF|string|size:2',
-            'inscricoes.*.ativo' => 'required_if:tipo_pessoa,PF|boolean'
-        ]);
+            'email' => 'nullable|email',
+            'telefone' => 'nullable|string|max:15',
+            'celular' => 'nullable|string|max:15',
+            'cep' => 'nullable|string|size:9',
+            'logradouro' => 'nullable|string|max:100',
+            'numero' => 'nullable|string|max:10',
+            'complemento' => 'nullable|string|max:50',
+            'bairro' => 'nullable|string|max:50',
+            'cidade' => 'nullable|string|max:50',
+            'uf' => 'nullable|string|size:2',
+            'observacoes' => 'nullable|string|max:500',
+        ];
+
+        // Regras específicas para Pessoa Física
+        if ($request->input('tipo_pessoa') === 'PF') {
+            $rules = array_merge($rules, [
+                'nome_completo' => 'required|string|max:100',
+                'cpf' => ['required', 'string', 'size:14', new ValidaCpf],
+                'data_nascimento' => 'nullable|date',
+            ]);
+        }
+        // Regras específicas para Pessoa Jurídica
+        else {
+            $rules = array_merge($rules, [
+                'razao_social' => 'required|string|max:100',
+                'nome_fantasia' => 'nullable|string|max:100',
+                'cnpj' => ['required', 'string', 'size:18', new ValidaCnpj],
+            ]);
+        }
+
+        // Validação de domínios
+        if ($request->has('dominios')) {
+            $rules['dominios.*.dominio'] = [
+                'nullable',
+                'string',
+                'max:100',
+                'regex:/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/'
+            ];
+        }
+
+        // Validação de inscrições estaduais
+        if ($request->has('inscricoes')) {
+            $rules['inscricoes.*.uf'] = 'required|string|size:2';
+            $rules['inscricoes.*.inscricao'] = 'required|string|max:20';
+        }
+
+        $validated = $request->validate($rules);
 
         try {
             DB::beginTransaction();
-
-            // Atualizar cliente
+            
             $cliente = $this->clienteService->atualizar($id, $validated);
-
-            // Atualizar domínios
-            $cliente->dominios()->delete(); // Remove domínios existentes
-            if (!empty($request->dominios)) {
-                foreach ($request->dominios as $dominio) {
-                    $cliente->dominios()->create($dominio);
-                }
-            }
-
-            // Atualizar inscrições estaduais (apenas para PF)
-            $cliente->inscricoesEstaduais()->delete(); // Remove inscrições existentes
-            if ($request->tipo_pessoa === 'PF' && !empty($request->inscricoes)) {
-                foreach ($request->inscricoes as $inscricao) {
-                    $cliente->inscricoesEstaduais()->create($inscricao);
-                }
-            }
+            
+            $this->logActivity(
+                'Cliente atualizado com sucesso', 
+                'update', 
+                'cliente', 
+                $cliente->id
+            );
 
             DB::commit();
-
-            $this->logAtualizacao('cliente', $cliente->id);
-            return redirect()->route('clientes.index')
+            
+            return redirect()
+                ->route('clientes.index')
                 ->with('success', 'Cliente atualizado com sucesso!');
-
+                
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Erro ao atualizar cliente: ' . $e->getMessage())
-                ->withInput();
+            
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Erro ao atualizar cliente: ' . $e->getMessage());
         }
     }
 
     public function destroy($id)
     {
         try {
+            DB::beginTransaction();
+            
             $this->clienteService->excluir($id);
-            $this->logExclusao('cliente', $id);
+            
+            $this->logActivity(
+                'Cliente excluído com sucesso', 
+                'delete', 
+                'cliente', 
+                $id
+            );
 
-            return redirect()->route('clientes.index')
+            DB::commit();
+            
+            return redirect()
+                ->route('clientes.index')
                 ->with('success', 'Cliente excluído com sucesso!');
+                
         } catch (\Exception $e) {
-            return back()
+            DB::rollBack();
+            
+            return redirect()
+                ->back()
                 ->with('error', 'Erro ao excluir cliente: ' . $e->getMessage());
         }
     }

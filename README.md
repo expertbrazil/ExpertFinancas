@@ -1,102 +1,202 @@
-# Expert Finanças
+# ExpertFinancas
 
-Sistema de gestão financeira desenvolvido com Laravel 10.x
+Sistema de gestão financeira desenvolvido para auxiliar profissionais e empresas no controle de suas finanças.
 
-## 🚀 Requisitos do Sistema
+## Tecnologias
 
-- PHP 8.3.9 ou superior
-- MySQL 5.7 ou superior
-- Node.js 22.11.0 ou superior
-- npm 10.9.0 ou superior
-- Composer 2.8.3 ou superior
+- PHP 8.1+
+- Laravel 10.x
+- MySQL 8.0+
+- Bootstrap 5
+- JavaScript/jQuery
 
-## 📦 Instalação
+## Requisitos
 
-### 1. Configuração do Ambiente Local (MAMP)
+- PHP >= 8.1
+- Composer
+- MySQL >= 8.0
+- Node.js >= 14.x
+- NPM >= 6.x
 
-1. Instale o MAMP:
-   - Baixe em: https://www.mamp.info/
-   - Instale seguindo as instruções padrão
-   - Inicie o MAMP e verifique se as luzes estão verdes
+## Instalação
 
-### 2. Configuração do Projeto
+1. Clone o repositório
+```bash
+git clone [url-do-repositorio]
+```
 
-1. Clone o repositório:
-   ```bash
-   git clone [URL_DO_REPOSITORIO]
-   cd ExpertFinancas
-   ```
+2. Instale as dependências do PHP
+```bash
+composer install
+```
 
-2. Configure o ambiente:
-   ```bash
-   cp .env.example .env
-   ```
+3. Instale as dependências do Node.js
+```bash
+npm install
+```
 
-3. Configure o arquivo `.env`:
-   ```
-   DB_CONNECTION=mysql
-   DB_HOST=localhost
-   DB_PORT=8889
-   DB_DATABASE=expert_financas
-   DB_USERNAME=root
-   DB_PASSWORD=root
-   ```
+4. Configure o ambiente
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-4. Instale as dependências:
-   ```bash
-   composer install
-   npm install
-   ```
+5. Configure o banco de dados no arquivo `.env`
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=expert_financas
+DB_USERNAME=seu_usuario
+DB_PASSWORD=sua_senha
+```
 
-5. Gere a chave da aplicação:
-   ```bash
-   php artisan key:generate
-   ```
+6. Execute as migrations e seeders
+```bash
+php artisan migrate --seed
+```
 
-6. Importe o banco de dados:
-   ```bash
-   mysql -h localhost -P 8889 -u root -proot expert_financas < database/expert_financas.sql
-   ```
+7. Compile os assets
+```bash
+npm run dev
+```
 
-### 3. Iniciando o Sistema
+8. Inicie o servidor
+```bash
+php artisan serve
+```
 
-1. Inicie o servidor Laravel:
-   ```bash
-   php artisan serve
-   ```
+## Sistema de Usuários
 
-2. Em outro terminal, inicie o Vite:
-   ```bash
-   npm run dev
-   ```
+O sistema possui três níveis de acesso:
 
-3. Acesse o sistema:
-   - Frontend: http://localhost:5179
-   - Backend: http://localhost:8000
+### Root (Superadministrador)
+- Acesso total ao sistema
+- Único com permissão para gerenciar administradores
+- Não pode ser excluído ou modificado
+- Credenciais padrão:
+  - Email: root@expertfinancas.com.br
+  - Senha: [definida no seeder]
 
-## 🔐 Credenciais Padrão
+### Administrador
+- Gerencia clientes e configurações gerais
+- Não pode modificar outros administradores
+- Criado apenas pelo root
 
-- Email: root@expertfinancas.com.br
-- Senha: Expert@2024
+### Cliente
+- Acesso às funcionalidades básicas
+- Gerenciado por administradores e root
 
-## 📚 Documentação Adicional
+Para mais detalhes sobre o sistema de usuários, consulte [docs/SISTEMA_USUARIOS.md](docs/SISTEMA_USUARIOS.md)
 
-- [Laravel Documentation](https://laravel.com/docs/10.x)
-- [MAMP Documentation](https://documentation.mamp.info/)
+## Estrutura do Projeto
 
-## 🛠️ Desenvolvimento
+### Diretórios Principais
+```
+app/
+├── Console/         # Comandos personalizados
+├── Http/
+│   ├── Controllers/ # Controladores da aplicação
+│   ├── Middleware/ # Middlewares personalizados
+│   └── Requests/   # Form requests para validação
+├── Models/         # Modelos do Eloquent
+└── Services/       # Serviços da aplicação
 
-- Framework: Laravel 10.x
-- Frontend: Bootstrap com Laravel UI
-- Database: MySQL (via MAMP)
-- Autenticação: Laravel's built-in authentication
+database/
+├── migrations/     # Migrações do banco de dados
+└── seeders/       # Seeders para dados iniciais
 
-## 🔒 Segurança
+resources/
+├── js/            # Arquivos JavaScript
+├── sass/          # Arquivos SASS/CSS
+└── views/         # Views Blade
 
-- Todas as senhas são hasheadas
-- Sistema de roles implementado
-- Proteção contra CSRF ativada
+public/            # Arquivos públicos
+└── assets/        # Assets compilados
+```
 
-## 📝 Licença
+## Segurança
 
-Este projeto é propriedade da Expert Finanças.
+- Autenticação robusta
+- Proteção contra CSRF
+- Validação em múltiplas camadas
+- Senhas hasheadas
+- Proteção de rotas por middleware
+- Logs de ações importantes
+
+## Logs
+
+O sistema mantém logs de:
+- Ações administrativas
+- Erros e exceções
+- Tentativas de acesso não autorizado
+- Modificações em dados críticos
+
+## Manutenção
+
+### Atualizações
+1. Atualize o código
+```bash
+git pull origin main
+```
+
+2. Atualize as dependências
+```bash
+composer update
+npm update
+```
+
+3. Execute as migrations
+```bash
+php artisan migrate
+```
+
+### Backup
+- Configure backups automáticos do banco
+- Mantenha cópias dos arquivos de upload
+- Documente todas as modificações
+
+## Debug e Solução de Problemas
+
+### Logs
+- Verifique `storage/logs/laravel.log`
+- Use `php artisan log:clear` para limpar logs
+
+### Cache
+```bash
+php artisan cache:clear
+php artisan config:clear
+php artisan view:clear
+```
+
+## Documentação Adicional
+
+- [Sistema de Usuários](docs/SISTEMA_USUARIOS.md)
+- [Configurações](docs/CONFIGURACOES.md)
+- [API](docs/API.md)
+
+## Contribuição
+
+1. Crie uma branch para sua feature
+```bash
+git checkout -b feature/nome-da-feature
+```
+
+2. Commit suas mudanças
+```bash
+git commit -m 'Adiciona nova feature'
+```
+
+3. Push para a branch
+```bash
+git push origin feature/nome-da-feature
+```
+
+4. Abra um Pull Request
+
+## Licença
+
+Este projeto está sob a licença [MIT](LICENSE).
+
+---
+Desenvolvido com ❤️ pela equipe ExpertFinancas

@@ -45,17 +45,20 @@
                             </div>
                             
                             <div class="col-md-6">
-                                <label for="role_id" class="form-label">Perfil</label>
-                                <select class="form-select @error('role_id') is-invalid @enderror" id="role_id" name="role_id" {{ $user->email === 'root@expertfinancas.com.br' ? 'disabled' : '' }}>
-                                    @foreach($roles as $role)
-                                        <option value="{{ $role->id }}" {{ old('role_id', $user->role_id) == $role->id ? 'selected' : '' }}>
-                                            {{ $role->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('role_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <div class="mb-3">
+                                    <label for="role" class="form-label">Perfil</label>
+                                    <select class="form-select @error('role') is-invalid @enderror" 
+                                            id="role" name="role" {{ $user->is_root ? 'disabled' : '' }}>
+                                        <option value="">Selecione...</option>
+                                        @if(auth()->user()->role === 'root')
+                                            <option value="admin" {{ old('role', $user->role) == 'admin' ? 'selected' : '' }}>Administrador</option>
+                                        @endif
+                                        <option value="cliente" {{ old('role', $user->role) == 'cliente' ? 'selected' : '' }}>Cliente</option>
+                                    </select>
+                                    @error('role')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
                             </div>
                         </div>
 

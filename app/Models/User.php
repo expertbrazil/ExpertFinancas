@@ -20,8 +20,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role_id',
-        'cliente_id'
+        'role',
+        'is_root',
     ];
 
     /**
@@ -42,6 +42,7 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
+        'is_root' => 'boolean',
     ];
 
     /**
@@ -93,8 +94,8 @@ class User extends Authenticatable
 
         // Impedir a exclusão do usuário root
         static::deleting(function ($user) {
-            if ($user->email === 'root@expertfinancas.com.br') {
-                throw new \Exception('O usuário root do sistema não pode ser excluído.');
+            if ($user->is_root) {
+                throw new \Exception('O usuário root não pode ser excluído.');
             }
         });
 

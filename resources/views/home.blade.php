@@ -169,56 +169,85 @@
             </div>
         </div>
     </div>
-</div>
 
-<style>
-    #faturamentoChart {
-        display: block;
-        box-sizing: border-box;
-        height: 1080px !important; /* Fix height to 1080px */
-        width: 1000px;
-    }
-</style>
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5>Versículo do Dia</h5>
+            <div id="versiculo"></div>
+        </div>
+    </div>
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Gráfico de Faturamento
-    var ctx = document.getElementById('faturamentoChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
-            datasets: [{
-                label: 'Faturamento',
-                data: {{ json_encode($dadosFaturamento ?? [0,0,0,0,0,0,0,0,0,0,0,0]) }},
-                borderColor: 'rgb(13, 110, 253)',
-                tension: 0.1,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+    <style>
+        #faturamentoChart {
+            display: block;
+            box-sizing: border-box;
+            height: 1080px !important; /* Fix height to 1080px */
+            width: 1000px;
+        }
+    </style>
+
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Gráfico de Faturamento
+        var ctx = document.getElementById('faturamentoChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                datasets: [{
+                    label: 'Faturamento',
+                    data: {{ json_encode($dadosFaturamento ?? [0,0,0,0,0,0,0,0,0,0,0,0]) }},
+                    borderColor: 'rgb(13, 110, 253)',
+                    tension: 0.1,
+                    fill: false
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return 'R$ ' + value.toLocaleString('pt-BR');
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return 'R$ ' + value.toLocaleString('pt-BR');
+                            }
                         }
                     }
                 }
             }
+        });
+
+        // Versículo do Dia
+        fetch('https://bible-api.com/john 3:16')
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('versiculo').innerText = data.text;
+            })
+            .catch(error => console.error('Erro ao buscar o versículo:', error));
+
+        // Sessão de logout automático
+        let sessionTimeout;
+        function resetSessionTimeout() {
+            clearTimeout(sessionTimeout);
+            sessionTimeout = setTimeout(() => {
+                alert('Sessão expirada. Você será deslogado.');
+                window.location.href = '{{ route('logout') }}';
+            }, 15 * 60 * 1000); // 15 minutos
         }
+
+        document.addEventListener('mousemove', resetSessionTimeout);
+        document.addEventListener('keypress', resetSessionTimeout);
+
+        resetSessionTimeout();
     });
-});
-</script>
-@endpush
-@endsection
+    </script>
+    @endpush
+    @endsection

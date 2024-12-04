@@ -237,5 +237,27 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="{{ asset('js/clientes.js') }}"></script>
+<script>
+    $(document).ready(function() {
+        function togglePessoaFields() {
+            const tipoPessoa = $('input[name="tipo_pessoa"]:checked').val();
+            if (tipoPessoa === 'PF') {
+                $('#pessoa_fisica').show();
+                $('#pessoa_juridica').hide();
+                $('input[name="razao_social"], input[name="cnpj"]').val('');
+            } else {
+                $('#pessoa_fisica').hide();
+                $('#pessoa_juridica').show();
+                $('input[name="nome_completo"], input[name="cpf"]').val('');
+            }
+        }
+
+        togglePessoaFields();
+
+        $('input[name="tipo_pessoa"]').change(function() {
+            togglePessoaFields();
+        });
+    });
+</script>
 @endpush
 @endsection

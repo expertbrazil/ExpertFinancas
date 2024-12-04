@@ -26,18 +26,28 @@ class Cliente extends Model
         'cpf',
         'data_nascimento',
         'razao_social',
+        'nome_fantasia',
         'cnpj',
-        'data_fundacao',
         'email',
         'telefone',
         'celular',
+        'cep',
+        'logradouro',
+        'numero',
+        'complemento',
+        'bairro',
+        'cidade',
+        'uf',
         'observacoes'
     ];
 
     protected $casts = [
         'data_nascimento' => 'date',
-        'data_fundacao' => 'date',
         'status' => 'boolean'
+    ];
+
+    protected $attributes = [
+        'status' => true
     ];
 
     /**
@@ -49,7 +59,7 @@ class Cliente extends Model
     }
 
     /**
-     * Get the subscriptions for the client.
+     * Get the assinaturas associated with the client.
      */
     public function assinaturas()
     {
@@ -57,7 +67,7 @@ class Cliente extends Model
     }
 
     /**
-     * Get the tickets for the client.
+     * Get the tickets associated with the client.
      */
     public function tickets()
     {
@@ -65,7 +75,7 @@ class Cliente extends Model
     }
 
     /**
-     * Get the documents for the client.
+     * Get the documentos associated with the client.
      */
     public function documentos()
     {
@@ -73,7 +83,7 @@ class Cliente extends Model
     }
 
     /**
-     * Get the invoices for the client.
+     * Get the faturas associated with the client.
      */
     public function faturas()
     {
@@ -81,15 +91,7 @@ class Cliente extends Model
     }
 
     /**
-     * Get the addresses for the client.
-     */
-    public function enderecos()
-    {
-        return $this->hasMany(Endereco::class);
-    }
-
-    /**
-     * Get the domains for the client.
+     * Get the dominios associated with the client.
      */
     public function dominios()
     {
@@ -97,30 +99,42 @@ class Cliente extends Model
     }
 
     /**
-     * Get the state registrations for the client.
+     * Get the inscricoes estaduais associated with the client.
      */
     public function inscricoesEstaduais()
     {
         return $this->hasMany(InscricaoEstadual::class);
     }
 
-    public function getIsPessoaFisicaAttribute()
+    /**
+     * Scope a query to filter active clients.
+     */
+    public function scopeAtivos($query)
     {
-        return $this->tipo_pessoa === 'PF';
+        return $query->where('status', true);
     }
 
-    public function getIsPessoaJuridicaAttribute()
+    /**
+     * Scope a query to filter by tipo_pessoa.
+     */
+    public function scopeTipoPessoa($query, $tipo)
     {
-        return $this->tipo_pessoa === 'PJ';
+        return $query->where('tipo_pessoa', $tipo);
     }
 
-    public function getDocumentoAttribute()
-    {
-        return $this->isPessoaFisica ? $this->cpf : $this->cnpj;
-    }
-
+    /**
+     * Get the display name based on tipo_pessoa.
+     */
     public function getNomeAttribute()
     {
-        return $this->isPessoaFisica ? $this->nome_completo : $this->razao_social;
+        return $this->tipo_pessoa === 'PF' ? $this->nome_completo : $this->razao_social;
+    }
+
+    /**
+     * Get the document number based on tipo_pessoa.
+     */
+    public function getDocumentoAttribute()
+    {
+        return $this->tipo_pessoa === 'PF' ? $this->cpf : $this->cnpj;
     }
 }

@@ -72,17 +72,16 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="role_id" class="form-label">Permissão</label>
-                            <select class="form-select @error('role_id') is-invalid @enderror" 
-                                    id="role_id" name="role_id" required>
-                                <option value="">Selecione uma permissão</option>
-                                @foreach($roles as $role)
-                                    <option value="{{ $role->id }}" {{ old('role_id') == $role->id ? 'selected' : '' }}>
-                                        {{ ucfirst($role->name) }}
-                                    </option>
-                                @endforeach
+                            <label for="role" class="form-label">Permissão</label>
+                            <select class="form-select @error('role') is-invalid @enderror" 
+                                    id="role" name="role" required>
+                                <option value="">Selecione...</option>
+                                @if(auth()->user()->role === 'root')
+                                    <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Administrador</option>
+                                @endif
+                                <option value="cliente" {{ old('role') == 'cliente' ? 'selected' : '' }}>Cliente</option>
                             </select>
-                            @error('role_id')
+                            @error('role')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

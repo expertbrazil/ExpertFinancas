@@ -15,13 +15,32 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="{{ asset('css/style.css') }}" rel="stylesheet">
     @stack('styles')
+    <style>
+        #loading {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            color: #333;
+        }
+    </style>
 </head>
 <body>
+    <div id="loading">Carregando...</div>
     <div class="wrapper">
         <!-- Sidebar -->
         <aside class="sidebar">
             <div class="sidebar-brand">
-                <img src="{{ asset('images/logo.png') }}" alt="Expert Finanças">
+                <img src="{{ asset('logos/logo.png') }}" alt="Expert Finanças">
             </div>
             
             <ul class="sidebar-menu">
@@ -150,7 +169,7 @@
                 </li>
 
                 <!-- Configurações (Admin) -->
-                @if(auth()->user()->role->slug === 'root' || auth()->user()->role->slug === 'admin')
+                @if(auth()->user()->role === 'root' || auth()->user()->role === 'admin')
                 <li class="has-submenu">
                     <a href="#" class="{{ request()->routeIs(['users.*', 'roles.*', 'parametros.*', 'configuracoes.*']) ? 'active' : '' }}">
                         <i class="fas fa-cogs"></i>
@@ -190,8 +209,14 @@
                         </li>
                         <li>
                             <a href="{{ route('configuracoes.logs') }}" class="{{ request()->routeIs('configuracoes.logs') ? 'active' : '' }}">
-                                <i class="fas fa-history"></i>
+                                <i class="fas fa-list-alt"></i>
                                 <span>Logs</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('technical-help.index') }}" class="{{ request()->routeIs('technical-help.*') ? 'active' : '' }}">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Ajuda Técnica</span>
                             </a>
                         </li>
                     </ul>
@@ -213,14 +238,6 @@
                 </div>
 
                 <div class="header-right">
-                    <!-- Notificações -->
-                    <div class="notifications me-3">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-bell"></i>
-                            <span class="badge bg-danger">3</span>
-                        </a>
-                    </div>
-
                     <!-- User Menu -->
                     <div class="user-menu dropdown">
                         <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
@@ -311,7 +328,16 @@
                     }
                 }
             });
+
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
         });
+    </script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
     </script>
     @stack('scripts')
 </body>

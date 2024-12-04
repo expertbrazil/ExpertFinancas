@@ -24,6 +24,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\FinanceiroController;
 use App\Http\Controllers\RelatoriosController;
 use App\Http\Controllers\ConfiguracoesController;
+use App\Http\Controllers\TechnicalHelpController;
 
 /*
 |--------------------------------------------------------------------------
@@ -143,6 +144,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/integracao', [ConfiguracoesController::class, 'integracao'])->name('integracao');
         Route::get('/backup', [ConfiguracoesController::class, 'backup'])->name('backup');
         Route::get('/logs', [ConfiguracoesController::class, 'logs'])->name('logs');
+    });
+
+    // Rotas de Ajuda Técnica
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/technical-help', [TechnicalHelpController::class, 'index'])->name('technical-help.index');
+        Route::get('/technical-help/search', [TechnicalHelpController::class, 'search'])->name('technical-help.search');
+        Route::get('/technical-help/diagram', [TechnicalHelpController::class, 'diagram'])->name('technical-help.diagram');
+        Route::get('/technical-help/{topic}', [TechnicalHelpController::class, 'show'])->name('technical-help.show');
     });
 });
 

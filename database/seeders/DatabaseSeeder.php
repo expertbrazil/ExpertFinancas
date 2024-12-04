@@ -11,10 +11,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Primeiro cria os papéis
-        $this->call(RoleSeeder::class);
-        
-        // Depois cria o usuário admin
-        $this->call(AdminSeeder::class);
+        $this->call([
+            RootUserSeeder::class,
+            RoleSeeder::class,
+            AdminSeeder::class,
+            // Outros seeders aqui...
+        ]);
     }
 }

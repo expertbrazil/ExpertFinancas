@@ -19,7 +19,7 @@ class CheckRole
             return redirect()->route('login');
         }
 
-        $userRole = $request->user()->role->slug;
+        $userRole = $request->user()->role;
 
         // Se for root, tem acesso total
         if ($userRole === 'root') {
