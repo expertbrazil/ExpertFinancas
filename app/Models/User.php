@@ -23,6 +23,7 @@ class User extends Authenticatable
         'role',
         'is_root',
         'avatar',
+        'profile_photo',
     ];
 
     /**
@@ -129,7 +130,11 @@ class User extends Authenticatable
      */
     public function hasRole($roleName)
     {
-        return $this->role->name === $roleName;
+        // Se role for nulo, definir como string vazia
+        $userRole = $this->role ?? '';
+
+        // Verifica se o usuário tem o role especificado ou se é root
+        return $userRole === $roleName || $this->is_root;
     }
 
     /**
@@ -140,6 +145,6 @@ class User extends Authenticatable
         if ($this->profile_photo && file_exists(public_path($this->profile_photo))) {
             return asset($this->profile_photo);
         }
-        return asset('images/default-avatar.png');
+        return asset('images/default-avatar.svg');
     }
 }

@@ -6,3 +6,149 @@
 
 // Bootstrap
 @import 'bootstrap/scss/bootstrap';
+
+/* User Menu Styles */
+.nav-user-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+}
+
+.dropdown-toggle {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.dropdown-toggle::after {
+    margin-left: 8px;
+}
+
+.dropdown-menu {
+    min-width: 200px;
+    padding: 0.5rem 0;
+    margin: 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.dropdown-item {
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    color: #333;
+}
+
+.dropdown-item i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.dropdown-divider {
+    margin: 0.5rem 0;
+}
+
+/* User Avatar Styles */
+.nav-user-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 8px;
+    border: 2px solid #e5e7eb;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* Layout Styles */
+.wrapper {
+    min-height: calc(100vh - 56px);
+}
+
+.sidebar {
+    width: 250px;
+    background: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.sidebar.collapsed {
+    margin-left: -250px;
+}
+
+.content {
+    padding: 1.5rem;
+    width: 100%;
+}
+
+/* Status Colors */
+.status-pendente { color: #ffc107; }
+.status-pago { color: #28a745; }
+.status-vencido { color: #dc3545; }
+.status-cancelado { color: #6c757d; }
+
+/* Money Input Styles */
+.money {
+    text-align: right;
+    font-family: monospace;
+}
+
+/* Table Styles */
+.table {
+    thead {
+        background-color: #f8f9fa;
+        th {
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+        }
+    }
+    
+    tbody {
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+    }
+}
+
+/* Card Styles */
+.card {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border: none;
+    
+    .card-header {
+        background-color: #fff;
+        border-bottom: 1px solid #eee;
+        font-weight: 600;
+    }
+}
+
+/* Button Styles */
+.btn {
+    &-primary {
+        background-color: #4a5568;
+        border-color: #4a5568;
+        
+        &:hover {
+            background-color: darken(#4a5568, 10%);
+            border-color: darken(#4a5568, 10%);
+        }
+    }
+    
+    &-outline-primary {
+        color: #4a5568;
+        border-color: #4a5568;
+        
+        &:hover {
+            background-color: #4a5568;
+            border-color: #4a5568;
+        }
+    }
+}
