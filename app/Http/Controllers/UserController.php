@@ -85,7 +85,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'password' => 'nullable|string|min:8|confirmed',
-            'role' => 'required|string|in:admin,cliente',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'whatsapp' => 'nullable|string|max:20',
         ]);
 
         // Apenas root pode mudar papel para administrador
@@ -95,20 +96,30 @@ class UserController extends Controller
                 ->with('error', 'Apenas o usuário root pode atribuir papel de administrador.');
         }
 
-        $updateData = [
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'role' => $validated['role'],
-        ];
+        if ($request->hasFile('avatar')) {
+            // Remove o avatar antigo se existir
+            if ($user->avatar) {
+                Storage::disk('public')->delete('avatars/' . $user->avatar);
+            }
 
-        if (!empty($validated['password'])) {
-            $updateData['password'] = Hash::make($validated['password']);
+            // Upload do novo avatar
+            $avatarName = Str::uuid() . '.' . $request->avatar->extension();
+            $request->avatar->storeAs('avatars', $avatarName, 'public');
+            $user->avatar = $avatarName;
         }
 
-        $user->update($updateData);
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->whatsapp = $validated['whatsapp'] ?? null;
+
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+
+        $user->save();
 
         return redirect()->route('users.index')
-            ->with('success', 'Usuário atualizado com sucesso!');
+            ->with('success', 'Usuário atualizado com sucesso.');
     }
 
     public function destroy(User $user)

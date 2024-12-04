@@ -17,6 +17,33 @@
                         @csrf
                         @method('PUT')
 
+                        <div class="row mb-4">
+                            <div class="col-md-12 text-center mb-4">
+                                <div class="avatar-upload">
+                                    <div class="avatar-preview mb-3">
+                                        <img src="{{ $user->avatar ? asset('storage/avatars/' . $user->avatar) : asset('images/avatar.png') }}" 
+                                             alt="Avatar" 
+                                             class="rounded-circle"
+                                             id="avatarPreview"
+                                             style="width: 150px; height: 150px; object-fit: cover; border: 3px solid #e9ecef;">
+                                    </div>
+                                    <div class="avatar-edit">
+                                        <label for="avatar" class="btn btn-primary">
+                                            <i class="fas fa-camera me-2"></i>Alterar Foto
+                                        </label>
+                                        <input type="file" 
+                                               id="avatar" 
+                                               name="avatar" 
+                                               class="d-none @error('avatar') is-invalid @enderror"
+                                               accept="image/*">
+                                        @error('avatar')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="name" class="form-label">Nome</label>
@@ -92,34 +119,40 @@
 
 @push('scripts')
 <script>
-document.getElementById('togglePassword').addEventListener('click', function (e) {
-    const password = document.getElementById('password');
-    const icon = this.querySelector('i');
-    
-    if (password.type === 'password') {
-        password.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        password.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
-});
+document.addEventListener('DOMContentLoaded', function() {
+    // Preview da imagem
+    document.getElementById('avatar').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 2 * 1024 * 1024) { // 2MB
+                alert('A imagem deve ter no máximo 2MB');
+                this.value = '';
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('avatarPreview').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
 
-document.getElementById('togglePasswordConfirmation').addEventListener('click', function (e) {
-    const password = document.getElementById('password_confirmation');
-    const icon = this.querySelector('i');
-    
-    if (password.type === 'password') {
-        password.type = 'text';
-        icon.classList.remove('fa-eye');
-        icon.classList.add('fa-eye-slash');
-    } else {
-        password.type = 'password';
-        icon.classList.remove('fa-eye-slash');
-        icon.classList.add('fa-eye');
-    }
+    // Toggle de senha
+    document.getElementById('togglePassword').addEventListener('click', function (e) {
+        const passwordInput = document.getElementById('password');
+        const icon = this.querySelector('i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    });
 });
 </script>
 @endpush

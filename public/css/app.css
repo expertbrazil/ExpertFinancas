@@ -292,6 +292,141 @@ body {
     }
 }
 
+/* Estilos da página de perfil */
+.profile-section {
+    margin-bottom: 2rem;
+}
+
+.profile-avatar {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 1rem;
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid var(--gray-200);
+    background-color: var(--gray-100);
+}
+
+.profile-avatar .upload-overlay {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: var(--primary);
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.profile-avatar .upload-overlay:hover {
+    background-color: var(--primary-dark);
+}
+
+.profile-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.profile-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.profile-form .form-label {
+    font-weight: 500;
+    color: var(--gray-700);
+    margin-bottom: 0.5rem;
+}
+
+.profile-form .form-control {
+    background-color: white;
+    border: 1px solid var(--gray-300);
+    transition: all 0.2s ease;
+}
+
+.profile-form .form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
+}
+
+.profile-form .btn-save {
+    width: 100%;
+    padding: 0.75rem;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+.profile-delete {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.profile-delete .card {
+    background-color: #fff5f5;
+    border: 1px solid #feb2b2;
+}
+
+.profile-delete .card-header {
+    background-color: transparent;
+    color: #c53030;
+    font-weight: 600;
+}
+
+.profile-delete .btn-danger {
+    background-color: var(--danger);
+    color: white;
+    border: none;
+}
+
+.profile-delete .btn-danger:hover {
+    background-color: #c53030;
+}
+
+.password-section {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--gray-200);
+}
+
+.password-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.password-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.file-upload-info {
+    font-size: 0.875rem;
+    color: var(--gray-500);
+    margin-top: 0.5rem;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .profile-form,
+    .password-form {
+        padding: 0 1rem;
+    }
+    
+    .profile-avatar {
+        width: 100px;
+        height: 100px;
+    }
+}
+
 /* Footer Styles */
 .footer {
     border-top: 1px solid rgba(255, 255, 255, 0.1);

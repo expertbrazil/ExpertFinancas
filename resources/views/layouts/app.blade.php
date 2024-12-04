@@ -32,6 +32,64 @@
             font-size: 1.5rem;
             color: #333;
         }
+        .daily-verse {
+            max-width: 640px;
+            margin-right: 20px;
+            font-size: 14px;
+            color: #666;
+            line-height: 1.3;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+        .daily-verse p {
+            margin: 0;
+        }
+        .verse-text {
+            font-style: italic;
+        }
+        .verse-reference {
+            font-weight: 500;
+            color: #444;
+            margin-top: 4px;
+            font-size: 13px;
+        }
+        .sidebar {
+            background-color: var(--sidebar-bg);
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow);
+            overflow-y: auto;
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 1rem 0;
+            margin: 0;
+        }
+        .sidebar-menu li a {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .sidebar-menu li a:hover,
+        .sidebar-menu li a.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .sidebar-menu li a i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -48,7 +106,7 @@
                 <li>
                     <a href="{{ route('dashboard') }}" class="{{ request()->routeIs('dashboard') ? 'active' : '' }}">
                         <i class="fas fa-home"></i>
-                        <span>Dashboard</span>
+                        <span></span>
                     </a>
                 </li>
 
@@ -234,14 +292,32 @@
                 </button>
 
                 <div class="header-left">
-                    <h4 class="mb-0">@yield('title', 'Dashboard')</h4>
+                    <h4 class="mb-0">@yield('title', '')</h4>
                 </div>
 
                 <div class="header-right">
+                    <!-- Versículo do Dia -->
+                    <div class="daily-verse d-none d-lg-block">
+                        <div id="versiculo">
+                            <div class="text-center">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">Carregando...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- User Menu -->
                     <div class="user-menu dropdown">
                         <a href="#" class="dropdown-toggle" data-bs-toggle="dropdown">
-                            <img src="{{ asset('images/avatar.png') }}" class="avatar" alt="User">
+                            <img 
+                                src="{{ auth()->user()->avatar 
+                                    ? asset('images/' . auth()->user()->avatar) 
+                                    : asset('images/default_avatar.png') }}" 
+                                class="avatar" 
+                                alt="User"
+                                style="width: 32px; height: 32px; object-fit: cover; border-radius: 50%;"
+                            >
                             <span class="d-none d-md-inline ms-2">{{ Auth::user()->name }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end">
@@ -289,50 +365,53 @@
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        window.addEventListener('load', function() {
+            document.getElementById('loading').style.display = 'none';
+        });
+
+        // Versículos em português
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle submenu
-            const hasSubmenuLinks = document.querySelectorAll('.has-submenu > a');
-            hasSubmenuLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const parent = this.parentElement;
-                    const wasOpen = parent.classList.contains('open');
-                    
-                    // Fecha todos os submenus
-                    document.querySelectorAll('.has-submenu').forEach(item => {
-                        item.classList.remove('open');
-                    });
-                    
-                    // Abre o submenu clicado (se não estava aberto)
-                    if (!wasOpen) {
-                        parent.classList.add('open');
-                    }
-                });
-            });
+            const versiculoDiv = document.getElementById('versiculo');
+            const versiculos = [
+                { texto: "Porque Deus amou tanto o mundo que deu seu Filho Unigênito, para que todo aquele que nele crer não pereça, mas tenha a vida eterna.", referencia: "João 3:16" },
+                { texto: "O Senhor é o meu pastor e nada me faltará.", referencia: "Salmos 23:1" },
+                { texto: "Deus é a minha salvação; terei confiança e não temerei. O Senhor, sim, o Senhor é a minha força e o meu cântico; ele é a minha salvação!", referencia: "Isaías 12:2" },
+                { texto: "Assim, quer vocês comam, quer bebam, quer façam qualquer outra coisa, façam tudo para a glória de Deus.", referencia: "1 Coríntios 10:31" },
+                { texto: "Entrega o teu caminho ao Senhor; confia nele, e ele tudo fará.", referencia: "Salmos 37:5" },
+                { texto: "Mas os que esperam no Senhor renovarão as suas forças; subirão com asas como águias; correrão, e não se cansarão; andarão, e não se fatigarão.", referencia: "Isaías 40:31" }
+            ];
 
-            // Toggle mobile menu
-            const mobileToggle = document.querySelector('.mobile-toggle');
-            const sidebar = document.querySelector('.sidebar');
-            
-            if (mobileToggle) {
-                mobileToggle.addEventListener('click', function() {
-                    sidebar.classList.toggle('show');
-                });
-            }
+            const hoje = new Date();
+            const indice = (hoje.getFullYear() + hoje.getMonth() + hoje.getDate()) % versiculos.length;
+            const versiculoDoDia = versiculos[indice];
 
-            // Fecha o menu mobile ao clicar fora
-            document.addEventListener('click', function(e) {
-                if (window.innerWidth < 992) {
-                    if (!sidebar.contains(e.target) && !mobileToggle.contains(e.target)) {
-                        sidebar.classList.remove('show');
+            versiculoDiv.innerHTML = `
+                <div class="verse-content">
+                    <p class="verse-text">"${versiculoDoDia.texto}"</p>
+                    <p class="verse-reference">${versiculoDoDia.referencia}</p>
+                </div>
+            `;
+        });
+
+        // Submenu toggle
+        document.querySelectorAll('.has-submenu > a').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const parent = this.parentElement;
+                const submenu = parent.querySelector('.submenu');
+                
+                // Toggle active class
+                parent.classList.toggle('open');
+                
+                // Toggle submenu
+                if (submenu) {
+                    if (submenu.style.maxHeight) {
+                        submenu.style.maxHeight = null;
+                    } else {
+                        submenu.style.maxHeight = submenu.scrollHeight + "px";
                     }
                 }
             });
-
-            const loading = document.getElementById('loading');
-            if (loading) {
-                loading.style.display = 'none';
-            }
         });
     </script>
     <script type="module">

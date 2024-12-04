@@ -31,81 +31,78 @@
 <script src="{{ asset('js/diagrams/document-flow.js') }}"></script>
 
 <script>
-let graph = null;
+document.addEventListener('DOMContentLoaded', function() {
+    let graph = null;
+    let currentType = 'user';
 
-function initGraph() {
-    if (graph) {
-        graph.dispose();
+    function initGraph() {
+        if (graph) {
+            graph.dispose();
+        }
+
+        graph = new X6.Graph({
+            container: document.getElementById('diagram-container'),
+            grid: {
+                type: 'mesh',
+                size: 10,
+                visible: true,
+                color: '#ddd',
+            },
+            mousewheel: {
+                enabled: true,
+                modifiers: ['ctrl', 'meta'],
+            },
+            connecting: {
+                router: 'manhattan',
+                connector: {
+                    name: 'rounded',
+                    args: {
+                        radius: 8,
+                    },
+                },
+                anchor: 'center',
+                connectionPoint: 'anchor',
+            },
+        });
+
+        return graph;
     }
 
-    return new X6.Graph({
-        container: document.getElementById('diagram-container'),
-        grid: {
-            type: 'mesh',
-            size: 10,
-            visible: true,
-            color: '#ddd',
-        },
-        mousewheel: {
-            enabled: true,
-            modifiers: ['ctrl', 'meta'],
-            factor: 1.1,
-            maxScale: 1.5,
-            minScale: 0.5,
-        },
-        connecting: {
-            anchor: 'center',
-            connector: 'rounded',
-            connectionPoint: 'anchor',
-            router: 'manhattan',
-        },
-        interacting: {
-            nodeMovable: false,
-            edgeMovable: false,
-            edgeLabelMovable: false,
-            vertexMovable: false,
-            vertexAddable: false,
-            vertexDeletable: false,
-        },
-        background: {
-            color: '#f8f9fa',
-        },
-    });
-}
-
-function showDiagram(type) {
-    graph = initGraph();
-    
-    switch(type) {
-        case 'user':
-            createUserFlowDiagram(graph);
-            break;
-        case 'financial':
-            createFinancialFlowDiagram(graph);
-            break;
-        case 'document':
-            createDocumentFlowDiagram(graph);
-            break;
+    function loadDiagram(type) {
+        graph = initGraph();
+        currentType = type;
+        
+        switch(type) {
+            case 'user':
+                createUserFlowDiagram(graph);
+                break;
+            case 'financial':
+                createFinancialFlowDiagram(graph);
+                break;
+            case 'document':
+                createDocumentFlowDiagram(graph);
+                break;
+        }
     }
-}
 
-// Event Listeners
-document.addEventListener('DOMContentLoaded', () => {
-    // Inicializa com o diagrama de usuários
-    showDiagram('user');
-
-    // Configura os botões
-    const buttons = document.querySelectorAll('.btn-group .btn');
-    buttons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            // Remove active de todos os botões
-            buttons.forEach(btn => btn.classList.remove('active'));
-            // Adiciona active ao botão clicado
-            e.target.classList.add('active');
-            // Mostra o diagrama correspondente
-            showDiagram(e.target.dataset.type);
+    // Adicionar eventos aos botões
+    document.querySelectorAll('.btn-group .btn').forEach(button => {
+        button.addEventListener('click', function() {
+            // Remove active class from all buttons
+            document.querySelectorAll('.btn-group .btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Load corresponding diagram
+            loadDiagram(this.getAttribute('data-type'));
         });
     });
+
+    // Inicializar com o diagrama de usuários
+    loadDiagram('user');
 });
 </script>
 @endpush

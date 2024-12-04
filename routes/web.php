@@ -25,6 +25,7 @@ use App\Http\Controllers\FinanceiroController;
 use App\Http\Controllers\RelatoriosController;
 use App\Http\Controllers\ConfiguracoesController;
 use App\Http\Controllers\TechnicalHelpController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -41,9 +42,9 @@ Auth::routes();
 
 Route::middleware(['auth'])->group(function () {
     // Rota principal redireciona para o dashboard
-    Route::get('/', [HomeController::class, 'index'])->name('dashboard');
-    Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::get('/dashboard', [HomeController::class, 'index'])->name('dashboard');
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/home', [DashboardController::class, 'index'])->name('home');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // Módulo de Cadastros
     Route::resource('clientes', ClienteController::class);
@@ -117,7 +118,9 @@ Route::middleware(['auth'])->group(function () {
     // Rotas do Perfil
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/profile/avatar/remove', [ProfileController::class, 'removeAvatar'])->name('profile.avatar.remove');
 
     // Rotas Financeiro
     Route::middleware(['auth', 'role:admin'])->prefix('financeiro')->name('financeiro.')->group(function () {
